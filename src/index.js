@@ -15,7 +15,16 @@ function init() {
 	
 	var alpha, beta, gamma;
 	
-	var block1, block2, line;
+	var block0, block1, line;
+	
+	var columnLine = [];
+	var rowLine = [];
+	
+	var grid = [];
+	
+	var gridWidth;
+	var rowNum;	
+	var gridHeight;
 		
 	var main = $('#main');
 	
@@ -32,9 +41,15 @@ function init() {
 	app.renderer.backgroundColor = 0x0040A3;
 	app.renderer.autoResize = true;
 	app.renderer.resize(window.innerWidth, window.innerHeight);
+	
+	var stage = app.stage;
+	
 	$(app.view).appendTo(game);
 	
 	var ticker 	= new PIXI.ticker.Ticker({ autoStart : false});
+	//ticker.FPS = 0.5;
+	ticker.speed = 0.25;
+
 	
 	var manager = new PIXI.interaction.InteractionManager(app);
     //manager.on('pointermove', handleMouse);
@@ -57,36 +72,45 @@ function init() {
 	}());
 	
 	//var mousePos = Utils.getMousePosition();
+	
+	var dRate = 0;
+	var dTick = 0;
 
-	function handleBlocks() {
+	function handleBlocks(delta) {
+		
+		dRate += delta;
+		
+		for ()
+				
+		if (dRate >= 10) {
+			if (dTick < rowNum - 2) {
+				block0.y += gridHeight;
+				dTick += 1;
+				dRate = 0;
+			} else {
+				block0.y = block0.y;
+			}
+			
+		}
 		
 	}
 	
-	$(window).mousemove( function(e) {
-		//handleMouse();
-	});
-	
-	var columnLine = [];
-	var rowLine = [];
-	
-	var grid = [];
-	
-	function setUp() {
-		log('setup');
+	function setPosition() {
+		log('setPosition');
 		
-		var gridWidth  = _width / 4;
-		var gridHeight = _height / 6;
+		gridWidth  = _width / 4;
+		//var gridHeight = _height / 6;
+		
+		rowNum = Math.round(_height / gridWidth);
+		
+		log('ROWNUM : ' + rowNum);
+		
+		gridHeight = gridWidth;
 		
 		log(gridWidth + '    ' + gridHeight);
 		
-		block1 = new PIXI.Sprite(resources['credit.png'].texture);
-		block2 = new PIXI.Sprite(resources['deduction.png'].texture);
-		
 		grid = [];
-		
-		
-		
-		
+			
 		for ( var i = 0; i < 4; i++ ) {
 			columnLine[i]  = new PIXI.Graphics();
 			columnLine[i].lineStyle(1, 0x000000, 1);
@@ -94,20 +118,42 @@ function init() {
 			columnLine[i].lineTo( 0 , _height);
 			columnLine[i].x = _width / 4 * i;
 			columnLine[i].y = 0;
-			app.stage.addChild(columnLine[i]);
+			stage.addChild(columnLine[i]);
 		}
 		
-		for ( var i = 0; i < 6; i++ ) {
+		for ( var i = 0; i < rowNum; i++ ) {
 			rowLine[i]  = new PIXI.Graphics();
 			rowLine[i].lineStyle(1, 0x000000, 1);
 			rowLine[i].moveTo( 0 , 0);
 			rowLine[i].lineTo( _width , 0);
 			rowLine[i].x = 0;
-			rowLine[i].y = _height / 6 * i;
-			app.stage.addChild(rowLine[i]);
+			rowLine[i].y = gridHeight * i;
+			stage.addChild(rowLine[i]);
 		}
-
-		//ticker.start();		
+		
+		block0.width = gridWidth;
+		block1.width = gridWidth;
+		
+		block0.height = gridHeight;
+		block1.height = gridHeight;
+		
+		block0.x = _width - block0.width;
+		
+		stage.addChild(block0);
+		stage.addChild(block1);
+			
+		log( 'STAGE CHILDREN : ' + stage.children.length);
+		
+		ticker.start();
+	}
+	
+	function setUp() {
+		log('setup');
+		
+		block0 = new PIXI.Sprite(resources['credit.png'].texture);
+		block1 = new PIXI.Sprite(resources['deduction.png'].texture);
+		
+		setPosition();		
 	}
 	
 	function loadProgressHandler() {
@@ -125,7 +171,7 @@ function init() {
 	
 	ticker.add( function(delta){
 		//log('tick');
-		handleBlocks();		
+		handleBlocks(delta);		
 	});
 	
 	window.addEventListener('deviceorientation', function(e) {
@@ -134,9 +180,12 @@ function init() {
 		beta 	= Math.round(e.beta);
 		gamma 	= Math.round(e.gamma);
 		
-		//$(debugText).html('ALPHA : ' + alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
+		$(debugText).html('ALPHA : ' + alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
 		
 	});
+		
+		
+	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }	
 		
 	$(window).resize(function(e) {
 		clearTimeout(resizeTimer);
@@ -144,6 +193,12 @@ function init() {
 			_width = window.innerWidth;
 			_height = window.innerHeight;
 			app.renderer.resize( _width, _height );
+			
+			for (var i = stage.children.length - 1; i >= 0; i--) {	
+				stage.removeChild(stage.children[i]);
+			};	
+
+			setPosition();
 		}, 250);
 	});
 	
@@ -171,7 +226,7 @@ function init() {
 	function onTouchMove(event){  
 		currentMousePos.x = event.pageX;  
 		currentMousePos.y = event.pageY;		
-		$(debugText).html('TOUCH X : ' +  currentMousePos.x + '<br>' + 'TOUCH Y : ' +  currentMousePos.y );
+		//$(debugText).html('TOUCH X : ' +  currentMousePos.x + '<br>' + 'TOUCH Y : ' +  currentMousePos.y );
 	}
 		
 	function onTouchEnd(event){  

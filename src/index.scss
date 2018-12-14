@@ -22,7 +22,7 @@ body {
 }
 
 #debugText {
-	top: 0;
+	bottom: 0;
 	left: 0;
 	width: 25%;
 	height: 160px;
@@ -32,5 +32,5 @@ body {
 	font-size: 0.75em;
 	font-color: black;
 	font-family: monospace;
-	opacity: 0.3;
+	opacity: 0.9;
 }
