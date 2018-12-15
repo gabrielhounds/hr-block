@@ -15,7 +15,7 @@ function init() {
 	
 	var alpha, beta, gamma;
 	
-	var block0, block1, line;
+	var blocks0, blocks1, blocks2, line;
 	
 	var columnLine = [];
 	var rowLine = [];
@@ -92,7 +92,7 @@ function init() {
 				//blockIndex = blockIndex + 1;
 				dTick = 0;
 				
-				if (blockIndex < blocks.length -1) {
+				if (blockIndex < blocks.length - 2) {
 					blockIndex++;
 				} else {
 					blockIndex = blocks.length -1;
@@ -113,6 +113,9 @@ function init() {
 		
 	}
 	
+	var sq = [];
+	var gd = [];
+	
 	function setPosition() {
 		log('setPosition');
 		
@@ -128,7 +131,120 @@ function init() {
 		log(gridWidth + '    ' + gridHeight);
 		
 		grid = [];
+		
+		//for (var i = 0; i < rowNum; i++) {
+		//	for (j = 0; j<4; j++) {	
 			
+			
+		/*for (var i=0; i<rowNum;i++) {
+			sq[i] = new PIXI.Graphics();
+			sq[i].beginFill(0x66CCFf);
+			sq[i].lineStyle(1, 0x000000, 1);
+			sq[i].drawRect(0, 0, gridWidth, gridHeight);
+			sq[i].endFill();
+			sq[i].x = 0;
+			sq[i].y = gridHeight * i;
+			stage.addChild(sq[i]);
+		}
+			
+		sq[0].alpha = 0.5;*/
+		
+		
+		
+		for (var i = 0; i < rowNum; i++) {
+			sq[i] = [];		
+			for (j = 0; j < 4; j++) {
+				sq[i][j] = new PIXI.Graphics();
+				sq[i][j].beginFill(0x66CCFf);
+				sq[i][j].lineStyle(1, 0x000000, 1);
+				sq[i][j].drawRect(0, 0, gridWidth, gridHeight);
+				sq[i][j].endFill();
+				sq[i][j].x = _width / 4 * j;
+				sq[i][j].y = gridHeight * i;
+				stage.addChild(sq[i][j]);
+			}
+		}
+		
+		//sq[3][0].alpha = 0.5;
+		
+		sq[0][0].addChild(blocks0);
+		
+		sq[0][3].addChild(blocks1);
+		
+		sq[3][2].addChild(blocks2);
+		
+		log('SQ LENGTH: ' + sq.length);
+		
+		for (var i = 0; i < rowNum; i++) {
+			for (var j = 0; j < 4; j++) {
+				//log('ROWNUM : ' + j);
+				
+				
+				sq[i][j].alpha = 0.5;
+				
+				if (sq[i][j].children.length === 0) {
+					
+					//log(this);
+					
+					sq[i][j].alpha = 1.0;
+				} else {
+					log('CHILDREN IN ROW NUM ' + i + ' | COLUMN NUM ' + j + ' | Children : ' + sq[i][j].children.length);
+				}
+				
+			}			
+		}
+		
+		//log(sq[0][1]);	
+		
+		/*for (var i = 0; i < 4; i++) {
+			
+			for (j = 0; j < rowNum; j++) {	
+				
+				log('SQUARES = ' + i +j);		
+				
+				sq[i + j] = new PIXI.Graphics();
+				
+				sq[i + j].beginFill(0x66CCFf);
+				
+				sq[i + j].lineStyle(1, 0x000000, 1);
+				
+				sq[i + j].drawRect(0, 0, gridWidth, gridHeight);
+				
+				sq[i + j].endFill();
+				
+				sq[i + j].x = _width / 4 * i;
+				
+				sq[i + j].y = gridHeight * j;
+				
+				stage.addChild(sq[i + j]);
+				
+				//log(sq[i*j]);
+			}
+		}
+		*/
+		
+		//sq[18].alpha = 0.5;
+		//sq[0].alpha = 0.5;
+		//sq[8].alpha = 0.5;
+		
+		//log(sq);
+		
+		//log(sq.length);
+		
+		for (var i = 0; i < 4; i++) {
+			for (j = 0; j < rowNum; j++) {
+				
+				gd[j *i] = [];
+				//gd[i*j].push(_width / 4 * j,  _height / rowNum * i);
+				
+				gd[i*j].push(j);
+			}
+		}
+		
+		log(gd.length);
+		
+		
+		/*	
 		for ( var i = 0; i < 4; i++ ) {
 			columnLine[i]  = new PIXI.Graphics();
 			columnLine[i].lineStyle(1, 0x000000, 1);
@@ -148,14 +264,18 @@ function init() {
 			rowLine[i].y = gridHeight * i;
 			stage.addChild(rowLine[i]);
 		}
+		*/
+		
+		
+		blocks0.width = blocks0.height = gridWidth;
+		blocks1.width = blocks1.height = gridWidth;
+		blocks2.width = blocks2.height = gridWidth;
+		
+		//blocks0.height = gridHeight;
+		//blocks1.height = gridHeight;
+		
 		
 		/*
-		blocks[0].width = gridWidth;
-		blocks[1].width = gridWidth;
-		
-		blocks[0].height = gridHeight;
-		blocks[1].height = gridHeight;
-		
 		blocks[0].x = _width - blocks[0].width;
 		
 		stage.addChild(blocks[0]);
@@ -167,7 +287,7 @@ function init() {
 			blocks[i].height = gridHeight;
 			blocks[i].y = -gridHeight;
 			
-			blocks[i].x = Utils.random(0, gridWidth * 4);
+			//blocks[i].x = Utils.random(0, gridWidth * 4);
 			
 			stage.addChild(blocks[i]);
 			
@@ -176,7 +296,7 @@ function init() {
 			
 		log( 'STAGE CHILDREN : ' + stage.children.length);
 		
-		ticker.start();
+		//ticker.start();
 	}
 	
 	
@@ -189,12 +309,14 @@ function init() {
 		
 		
 		
-		//block0 = new PIXI.Sprite(resources['credit.png'].texture);
-		//block1 = new PIXI.Sprite(resources['deduction.png'].texture);
+		blocks0 = new PIXI.Sprite(resources['credit.png'].texture);
+		blocks1 = new PIXI.Sprite(resources['deduction.png'].texture);
+		blocks2 = new PIXI.Sprite(resources['credit.png'].texture);
+
 		
-		for (var i = 0; i<10; i++) {
+		for (var i = 0; i < 10; i++) {
 			
-			blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
+			//blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
 			
 			
 			
