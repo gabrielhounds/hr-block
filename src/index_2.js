@@ -83,12 +83,12 @@ function init() {
 		dRate += delta;
 		
 		if (dRate >= 10) {
-			if (dTick < rowNum - 2) {
+			if (dTick < rowNum - 3) {
 				blocks[blockIndex].y += gridHeight;
 				dTick += 1;
 				dRate = 0;
 			} else {
-				blocks[blockIndex].y = 410;
+				blocks[blockIndex].y = gridHeight*4;
 				//blockIndex = blockIndex + 1;
 				dTick = 0;
 				
@@ -132,33 +132,18 @@ function init() {
 		
 		grid = [];
 		
-		//for (var i = 0; i < rowNum; i++) {
-		//	for (j = 0; j<4; j++) {	
-			
-			
-		/*for (var i=0; i<rowNum;i++) {
-			sq[i] = new PIXI.Graphics();
-			sq[i].beginFill(0x66CCFf);
-			sq[i].lineStyle(1, 0x000000, 1);
-			sq[i].drawRect(0, 0, gridWidth, gridHeight);
-			sq[i].endFill();
-			sq[i].x = 0;
-			sq[i].y = gridHeight * i;
-			stage.addChild(sq[i]);
+		for (var i = 0; i<blocks.length; i++) {
+			blocks[i].width = blocks[i].height = gridWidth;
 		}
-			
-		sq[0].alpha = 0.5;*/
-		
-		
 		
 		for (var i = 0; i < rowNum; i++) {
 			sq[i] = [];		
 			for (j = 0; j < 4; j++) {
 				sq[i][j] = new PIXI.Graphics();
-				sq[i][j].beginFill(0x66CCFf);
+				//sq[i][j].beginFill(0x66CCFf);
 				sq[i][j].lineStyle(1, 0x000000, 1);
 				sq[i][j].drawRect(0, 0, gridWidth, gridHeight);
-				sq[i][j].endFill();
+				//sq[i][j].endFill();
 				sq[i][j].x = _width / 4 * j;
 				sq[i][j].y = gridHeight * i;
 				stage.addChild(sq[i][j]);
@@ -167,11 +152,10 @@ function init() {
 		
 		//sq[3][0].alpha = 0.5;
 		
-		sq[0][0].addChild(blocks0);
-		
-		sq[0][3].addChild(blocks1);
-		
-		sq[3][2].addChild(blocks2);
+		sq[0][0].addChild(blocks[0]);
+		sq[0][1].addChild(blocks[1]);		
+		sq[0][2].addChild(blocks[2]);
+		sq[0][3].addChild(blocks[3]);
 		
 		log('SQ LENGTH: ' + sq.length);
 		
@@ -179,8 +163,7 @@ function init() {
 			for (var j = 0; j < 4; j++) {
 				//log('ROWNUM : ' + j);
 				
-				
-				sq[i][j].alpha = 0.5;
+				//sq[i][j].alpha = 0.5;
 				
 				if (sq[i][j].children.length === 0) {
 					
@@ -193,110 +176,13 @@ function init() {
 				
 			}			
 		}
-		
-		//log(sq[0][1]);	
-		
-		/*for (var i = 0; i < 4; i++) {
 			
-			for (j = 0; j < rowNum; j++) {	
-				
-				log('SQUARES = ' + i +j);		
-				
-				sq[i + j] = new PIXI.Graphics();
-				
-				sq[i + j].beginFill(0x66CCFf);
-				
-				sq[i + j].lineStyle(1, 0x000000, 1);
-				
-				sq[i + j].drawRect(0, 0, gridWidth, gridHeight);
-				
-				sq[i + j].endFill();
-				
-				sq[i + j].x = _width / 4 * i;
-				
-				sq[i + j].y = gridHeight * j;
-				
-				stage.addChild(sq[i + j]);
-				
-				//log(sq[i*j]);
-			}
-		}
-		*/
 		
-		//sq[18].alpha = 0.5;
-		//sq[0].alpha = 0.5;
-		//sq[8].alpha = 0.5;
-		
-		//log(sq);
-		
-		//log(sq.length);
-		
-		for (var i = 0; i < 4; i++) {
-			for (j = 0; j < rowNum; j++) {
-				
-				gd[j *i] = [];
-				//gd[i*j].push(_width / 4 * j,  _height / rowNum * i);
-				
-				gd[i*j].push(j);
-			}
-		}
-		
-		log(gd.length);
-		
-		
-		/*	
-		for ( var i = 0; i < 4; i++ ) {
-			columnLine[i]  = new PIXI.Graphics();
-			columnLine[i].lineStyle(1, 0x000000, 1);
-			columnLine[i].moveTo( 0 , 0);
-			columnLine[i].lineTo( 0 , _height);
-			columnLine[i].x = _width / 4 * i;
-			columnLine[i].y = 0;
-			stage.addChild(columnLine[i]);
-		}
-		
-		for ( var i = 0; i < rowNum; i++ ) {
-			rowLine[i]  = new PIXI.Graphics();
-			rowLine[i].lineStyle(1, 0x000000, 1);
-			rowLine[i].moveTo( 0 , 0);
-			rowLine[i].lineTo( _width , 0);
-			rowLine[i].x = 0;
-			rowLine[i].y = gridHeight * i;
-			stage.addChild(rowLine[i]);
-		}
-		*/
-		
-		
-		blocks0.width = blocks0.height = gridWidth;
-		blocks1.width = blocks1.height = gridWidth;
-		blocks2.width = blocks2.height = gridWidth;
-		
-		//blocks0.height = gridHeight;
-		//blocks1.height = gridHeight;
-		
-		
-		/*
-		blocks[0].x = _width - blocks[0].width;
-		
-		stage.addChild(blocks[0]);
-		stage.addChild(blocks[1]);
-		*/
-		
-		for (var i = 0; i<blocks.length; i++) {
-			blocks[i].width = gridWidth;
-			blocks[i].height = gridHeight;
-			blocks[i].y = -gridHeight;
-			
-			//blocks[i].x = Utils.random(0, gridWidth * 4);
-			
-			stage.addChild(blocks[i]);
-			
-		}
 		
 			
 		log( 'STAGE CHILDREN : ' + stage.children.length);
 		
-		//ticker.start();
+		ticker.start();
 	}
 	
 	
@@ -309,14 +195,14 @@ function init() {
 		
 		
 		
-		blocks0 = new PIXI.Sprite(resources['credit.png'].texture);
-		blocks1 = new PIXI.Sprite(resources['deduction.png'].texture);
-		blocks2 = new PIXI.Sprite(resources['credit.png'].texture);
+		//blocks0 = new PIXI.Sprite(resources['credit.png'].texture);
+		//blocks1 = new PIXI.Sprite(resources['deduction.png'].texture);
+		//blocks2 = new PIXI.Sprite(resources['credit.png'].texture);
 
 		
 		for (var i = 0; i < 10; i++) {
 			
-			//blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
+			blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
 			
 			
 			
