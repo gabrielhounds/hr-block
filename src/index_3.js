@@ -23,6 +23,9 @@ function init() {
 	var grid = [];
 	var blocks = [];
 	
+	var sq = [];
+	var gd = [];
+	
 	var gridWidth;
 	var rowNum;	
 	var gridHeight;
@@ -77,44 +80,30 @@ function init() {
 	var dRate = 0;
 	var dTick = 0;
 	var blockIndex = 0;
+	var gridIndex = 0;
+	var columnIndex = 0;
 
 	function handleBlocks(delta) {
 		
 		dRate += delta;
 		
 		if (dRate >= 10) {
-			if (dTick < rowNum - 3) {
-				blocks[blockIndex].y += gridHeight;
-				dTick += 1;
-				dRate = 0;
-			} else {
-				blocks[blockIndex].y = gridHeight*4;
-				//blockIndex = blockIndex + 1;
-				dTick = 0;
-				
-				if (blockIndex < blocks.length - 2) {
-					blockIndex++;
-				} else {
-					blockIndex = blocks.length -1;
-					ticker.stop();
-				}
-				
-				log(blockIndex);
-				//log(blocks[blockIndex].y);
-				//return false;
-			}
-		}
-		
-		for (var i = 0; i < blocks.length; i++) {
 			
-		}
+			if (gridIndex < sq.length - 1 ) {
+				sq[gridIndex][columnIndex].addChild(blocks[0]);
+				gridIndex ++;
+				dRate = 0;
+			}
+			
+			if (columnIndex < 3) {
+				//columnIndex ++;
+			}
 				
-		
-		
+		}
+			
 	}
 	
-	var sq = [];
-	var gd = [];
+	
 	
 	function setPosition() {
 		log('setPosition');
@@ -152,13 +141,14 @@ function init() {
 		
 		//sq[3][0].alpha = 0.5;
 		
-		sq[0][0].addChild(blocks[0]);
+		/*sq[0][0].addChild(blocks[0]);
 		sq[0][1].addChild(blocks[1]);		
 		sq[0][2].addChild(blocks[2]);
 		sq[0][3].addChild(blocks[3]);
 		
 		sq[0][3].removeChild(blocks[3]);		
 		sq[1][3].addChild(blocks[3]);
+		*/
 
 
 		
@@ -187,7 +177,7 @@ function init() {
 			
 		log( 'STAGE CHILDREN : ' + stage.children.length);
 		
-		//ticker.start();
+		ticker.start();
 	}
 	
 	
