@@ -86,12 +86,16 @@ function init() {
 	var rowIndex = 0;
 	var gridIndex = 0;
 	var columnIndex = 1;
+	
+	function isRowFilled(i) {
+		return i === 'filled';
+	}
 
 	function handleBlocks(delta) {
 
 		dRate += delta;
 
-		if (dRate >= 1) {
+		if (dRate >= 4) {
 			if (rowIndex < sq.length-1) {
 				log(' MOVE DOWN ');
 				
@@ -103,6 +107,7 @@ function init() {
 				if (grid[rowIndex + 1][columnIndex] !== 'filled') {
 					
 					log(grid[rowIndex][columnIndex]);
+					
 					rowIndex++;	
 					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);			
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
@@ -118,7 +123,9 @@ function init() {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						ticker.stop();
 					}
-										
+					
+					log('FULL ROW = ' + grid[rowIndex].every(isRowFilled));
+									
 					rowIndex = 0;
 					blockIndex++;
 					columnIndex = Utils.random(0,3);
@@ -130,10 +137,15 @@ function init() {
 				log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
 				log('At the end - Lock Pice');
 				grid[rowIndex][columnIndex] = 'filled';
+				
+				log('FULL ROW = ' + grid[rowIndex].every(isRowFilled));
+
 				rowIndex = 0;
 				blockIndex++;
 				columnIndex = Utils.random(0,3);
 			}
+			
+			
 			
 			dRate = 0;
 		}
