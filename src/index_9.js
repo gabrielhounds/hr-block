@@ -47,7 +47,7 @@ function init() {
 	var _height = window.innerHeight;
 
 	app = new Application({width : _width, height : _height, legacy : true, transparent : false });
-	app.renderer.backgroundColor = 0x0040A3;
+	app.renderer.backgroundColor = 0xFFFFFF;
 	app.renderer.autoResize = true;
 	app.renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -85,7 +85,8 @@ function init() {
 	var blockIndex = 0;
 	var rowIndex = 0;
 	var gridIndex = 0;
-	var columnIndex = 1;
+	var columnIndex = 2;
+	var newRow;
 
 	function isFilled(i) {
 		return i === 'filled';
@@ -120,20 +121,14 @@ function init() {
 		dRate += delta;
 
 		if (dRate >= 4) {
-			if (rowIndex < sq.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 
-				log(' TICK DOWN ');
-
-				//log(grid[rowIndex][columnIndex]);
+			if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 
 				rowIndex++;
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
 				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 
 			} else {
-
-				log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
-				log('On another piece - lock piece');
 
 				grid[rowIndex][columnIndex] = 'filled';
 
@@ -142,8 +137,6 @@ function init() {
 					ticker.stop();
 				}
 
-				//ticker.stop();
-
 				if ( grid[rowIndex].every(isFilled) ) {
 
 					for (var i = 0; i < 4; i++) {
@@ -151,15 +144,29 @@ function init() {
 						grid[rowIndex][i] = 'empty';
 					}
 
-					moveDown();
+					//moveDown();
+					// MOVE ALL THE PIECES DOWN
+					for (var r = rowNum - 1; r >= 0; r--) {
+						for (c = 4 - 1; c >= 0; c--) {
+							if( sq[r][c].children.length != 0 ) {
+								activeChild = sq[r][c].children[0];
+								newRow = r+=1;
+								sq[r][c].removeChild( activeChild );
+								sq[newRow][c].addChild( activeChild );
+							}
 
+							if (grid[r][c] === 'filled') {
+								grid[r][c] = 'empty';
+								newRow = r+=1;
+								grid[newRow][c] = 'filled';
+							}
+						}
+					}
 				}
-
-
 
 				rowIndex = 0;
 				blockIndex++;
-				columnIndex = Utils.random(0,3);
+				//columnIndex = Utils.random(0,3);
 
 			}
 
@@ -196,13 +203,12 @@ function init() {
 			sq[r] = [];
 			for (c = 0; c < 4; c++) {
 				sq[r][c] = new PIXI.Graphics();
-				sq[r][c].beginFill(0x66CCFf);
-				sq[r][c].lineStyle(1, 0x000000, 1);
+				sq[r][c].beginFill(0x66CCFf, 0);
+				sq[r][c].lineStyle(1, 0x000000, 0.1);
 				sq[r][c].drawRect(0, 0, gridWidth, gridHeight);
 				sq[r][c].endFill();
 				sq[r][c].x = _width / 4 * c;
 				sq[r][c].y = gridHeight * r;
-				//sq[r][c].alpha = 0;
 				gameBoard.addChild(sq[r][c]);
 			}
 		}
@@ -210,26 +216,7 @@ function init() {
 		gameBoard.y = -gridWidth;
 		stage.addChild(gameBoard);
 
-		log(grid);
-
-		log('SQ LENGTH: ' + sq.length);
-
-		for (var i = 0; i < rowNum; i++) {
-			for (var j = 0; j < 4; j++) {
-				if (sq[i][j].children.length === 0) {
-					log('NO CHILDREN');
-				} else {
-					log('CHILDREN IN ROW NUM ' + i + ' | COLUMN NUM ' + j + ' | Children : ' + sq[i][j].children.length);
-				}
-
-			}
-		}
-
-
-
-
-		log( 'STAGE CHILDREN : ' + stage.children.length);
-
+		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 
 		sq[1][0].on('pointerup', function(e){
