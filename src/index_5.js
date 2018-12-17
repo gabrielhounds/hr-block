@@ -15,7 +15,9 @@ function init() {
 
 	var alpha, beta, gamma;
 
-	var blocks0, blocks1, blocks2, line;
+	var blocks0, blocks1, blocks2, line, gameBoard;
+	
+	var blockImg0, blockImg1;
 
 	var columnLine = [];
 	var rowLine = [];
@@ -29,6 +31,9 @@ function init() {
 	var gridWidth;
 	var rowNum;
 	var gridHeight;
+	
+	var currentMousePos = { x: -1, y: -1 };
+
 
 	var main = $('#main');
 
@@ -75,11 +80,10 @@ function init() {
 
 	}());
 
-	//var mousePos = Utils.getMousePosition();
-
 	var dRate = 0;
 	var dTick = 0;
 	var blockIndex = 0;
+	var rowIndex = 0;
 	var gridIndex = 0;
 	var columnIndex = 1;
 
@@ -87,49 +91,71 @@ function init() {
 
 		dRate += delta;
 
-		if (dRate >= 10) {
-
-			if (gridIndex < sq.length - 1 ) {
-				sq[gridIndex][columnIndex].addChild(blocks[blockIndex]);
-				//log('COLUMN INDEX : ' + columnIndex);
-				gridIndex ++;
-				dRate = 0;
-			} else {
-				gridIndex = 0;
-				blockIndex ++;
-				columnIndex = Utils.random(0, 3);
-			}
-
-
-			if (columnIndex < 3) {
-				//columnIndex ++;
-
-			}
-
-			for (var i = 0; i < rowNum; i++) {
-				for (var j = 0; j < 4; j++) {
-				if (sq[i][j].children.length === 0) {
-
+		if (dRate >= 1) {
+			if (rowIndex < sq.length-1) {
+				log(' MOVE DOWN ');
+				
+				if (grid[1][columnIndex] === 'filled') {
+					log('game over');
+					ticker.stop();
+				}
+				
+				if (grid[rowIndex + 1][columnIndex] !== 'filled') {
+					
+					log(grid[rowIndex][columnIndex]);
+					rowIndex++;	
+					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);			
+					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
+					
 				} else {
-					//log('CHILDREN IN ROW NUM ' + i + ' | COLUMN NUM ' + j + ' | Children : ' + sq[i][j].children.length);
-					if (i === gridIndex && j === columnIndex) {
-						log('COLLISION IMMENENT');
-						gridIndex = 0;
-						blockIndex ++;
-						columnIndex = Utils.random(0, 3);
-
+					
+					log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
+					log('On another piece - lock piece');
+					
+					grid[rowIndex][columnIndex] = 'filled';
+					
+					if (rowIndex === 1) {
+						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
+						ticker.stop();
 					}
+										
+					rowIndex = 0;
+					blockIndex++;
+					columnIndex = Utils.random(0,3);
+					
+					
 				}
-				}
+				
+			} else {
+				log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
+				log('At the end - Lock Pice');
+				grid[rowIndex][columnIndex] = 'filled';
+				rowIndex = 0;
+				blockIndex++;
+				columnIndex = Utils.random(0,3);
+			}
+			
+			dRate = 0;
+		}
+	}
+	
+	/*
+	for ( var r = 0; r < rowNum; r++ ) {
+		for ( var c = 0; c < 4; c++ ) {
+			if ( grid[r][c] !== 'empty' ) {
+				log('NOT EMPTY');
 			}
 		}
-		
-		if (columnIndex >= blocks.length ) {
-			log('end of the blocks');
-			//ticker.stop();
-		}
-
 	}
+	
+	for (var i = 0; i < 4; i++) {
+			if( grid[rowIndex][i] === 'filled') {
+				log('========== --------- FULL ROW ---------- ==========');
+				ticker.stop();
+			}
+		}
+	
+	*/
 
 
 
@@ -137,62 +163,52 @@ function init() {
 		log('setPosition');
 
 		gridWidth  = _width / 4;
-		//var gridHeight = _height / 6;
-
+		gridHeight = gridWidth;
+		
 		rowNum = Math.round(_height / gridWidth);
 
-		log('ROWNUM : ' + rowNum);
-
-		gridHeight = gridWidth;
-
-		log(gridWidth + '    ' + gridHeight);
+		log( 'ROW HEIGHt : ' +  _height / gridWidth);
+		log('GRID SIZE ' +  gridWidth + ' X ' + gridHeight);
 
 		grid = [];
 
 		for (var i = 0; i<blocks.length; i++) {
 			blocks[i].width = blocks[i].height = gridWidth;
 		}
-
-		for (var i = 0; i < rowNum; i++) {
-			sq[i] = [];
-			for (j = 0; j < 4; j++) {
-				sq[i][j] = new PIXI.Graphics();
-				//sq[i][j].beginFill(0x66CCFf);
-				sq[i][j].lineStyle(1, 0x000000, 1);
-				sq[i][j].drawRect(0, 0, gridWidth, gridHeight);
-				//sq[i][j].endFill();
-				sq[i][j].x = _width / 4 * j;
-				sq[i][j].y = gridHeight * i;
-				stage.addChild(sq[i][j]);
+		
+		for ( var r = 0; r < rowNum; r++ ) {
+			grid[r] = [];
+			for ( var c = 0; c < 4; c++ ) {
+				grid[r][c] = 'empty';
 			}
 		}
 
-		//sq[3][0].alpha = 0.5;
-
-		/*sq[0][0].addChild(blocks[0]);
-		sq[0][1].addChild(blocks[1]);
-		sq[0][2].addChild(blocks[2]);
-		sq[0][3].addChild(blocks[3]);
-
-		sq[0][3].removeChild(blocks[3]);
-		sq[1][3].addChild(blocks[3]);
-		*/
-
-
-
+		for (var r = 0; r < rowNum; r++) {
+			sq[r] = [];
+			for (c = 0; c < 4; c++) {
+				sq[r][c] = new PIXI.Graphics();
+				sq[r][c].beginFill(0x66CCFf);
+				sq[r][c].lineStyle(1, 0x000000, 1);
+				sq[r][c].drawRect(0, 0, gridWidth, gridHeight);
+				sq[r][c].endFill();
+				sq[r][c].x = _width / 4 * c;
+				sq[r][c].y = gridHeight * r;
+				//sq[r][c].alpha = 0;
+				gameBoard.addChild(sq[r][c]);
+			}
+		}
+		
+		gameBoard.y = -gridWidth;
+		stage.addChild(gameBoard);
+		
+		log(grid);
+		
 		log('SQ LENGTH: ' + sq.length);
 
 		for (var i = 0; i < rowNum; i++) {
 			for (var j = 0; j < 4; j++) {
-				//log('ROWNUM : ' + j);
-
-				//sq[i][j].alpha = 0.5;
-
 				if (sq[i][j].children.length === 0) {
-
-					//log(this);
-
-					sq[i][j].alpha = 1.0;
+					log('NO CHILDREN');
 				} else {
 					log('CHILDREN IN ROW NUM ' + i + ' | COLUMN NUM ' + j + ' | Children : ' + sq[i][j].children.length);
 				}
@@ -207,29 +223,24 @@ function init() {
 
 		ticker.start();
 	}
+	
+	function createBlock() {
+		
+	}
 
-
-	//var block0, block1, block2, block3, block4, block5, block6, block7, block8, block9;
-
-	//var block = [];
 
 	function setUp() {
 		log('setup');
-
-
-
-		//blocks0 = new PIXI.Sprite(resources['credit.png'].texture);
-		//blocks1 = new PIXI.Sprite(resources['deduction.png'].texture);
-		//blocks2 = new PIXI.Sprite(resources['credit.png'].texture);
-
-
-		for (var i = 0; i < 2; i++) {
+		
+		//blockImg0 = new PIXI.Sprite(resources['credit.png'].texture);
+		//blockImg1 = new PIXI.Sprite(resources['deduction.png'].texture);
+		
+		for (var i = 0; i < 20; i++) {
 
 			blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
 		}
-
-
-		//blocks = [block0, block1];
+		
+		gameBoard = new PIXI.Container();
 
 		setPosition();
 	}
@@ -288,7 +299,6 @@ function init() {
 
 	});
 
-	var currentMousePos = { x: -1, y: -1 };
 
 	$(function () {
 		document.addEventListener('touchstart', onTouchStart, true);
