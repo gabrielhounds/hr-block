@@ -52,7 +52,7 @@ function init() {
 
 	var ticker 	= new PIXI.ticker.Ticker({ autoStart : false});
 	//ticker.FPS = 0.5;
-	ticker.speed = 0.25;
+	ticker.speed = 0.15;
 
 
 	var manager = new PIXI.interaction.InteractionManager(app);
@@ -81,7 +81,7 @@ function init() {
 	var dTick = 0;
 	var blockIndex = 0;
 	var gridIndex = 0;
-	var columnIndex = 0;
+	var columnIndex = 1;
 
 	function handleBlocks(delta) {
 
@@ -90,15 +90,38 @@ function init() {
 		if (dRate >= 10) {
 
 			if (gridIndex < sq.length - 1 ) {
-				sq[gridIndex][columnIndex].addChild(blocks[0]);
+				sq[gridIndex][columnIndex].addChild(blocks[blockIndex]);
+				//log('COLUMN INDEX : ' + columnIndex);
 				gridIndex ++;
 				dRate = 0;
+			} else {
+				gridIndex = 0;
+				blockIndex ++;
+				columnIndex = Utils.random(0, 3);
 			}
+
 
 			if (columnIndex < 3) {
 				//columnIndex ++;
+
 			}
 
+			for (var i = 0; i < rowNum; i++) {
+				for (var j = 0; j < 4; j++) {
+				if (sq[i][j].children.length === 0) {
+
+				} else {
+					//log('CHILDREN IN ROW NUM ' + i + ' | COLUMN NUM ' + j + ' | Children : ' + sq[i][j].children.length);
+					if (i === gridIndex && j === columnIndex) {
+						log('COLLISION IMMENENT');
+						gridIndex = 0;
+						blockIndex ++;
+						columnIndex = Utils.random(0, 3);
+
+					}
+				}
+				}
+			}
 		}
 
 	}
