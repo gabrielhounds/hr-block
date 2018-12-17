@@ -100,17 +100,16 @@ function init() {
 
 				log(' MOVE DOWN ');
 
-				//log(grid[rowIndex][columnIndex]);
+				log(grid[rowIndex][columnIndex]);
 
 				rowIndex++;
-
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
 				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 
 			} else {
 
-				log('OCCUPIED GRID or END OF BOARD | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
-				log('Lock Block');
+				log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
+				log('On another piece - lock piece');
 
 				grid[rowIndex][columnIndex] = 'filled';
 
@@ -132,23 +131,46 @@ function init() {
 					for (var i = 0; i < 4; i++) {
 						sq[rowIndex][i].removeChild(sq[rowIndex][i].children[0]);
 						grid[rowIndex][i] = 'empty';
+						//TODO:  ADD TO SCORE
 					}
+
+					log('================= UPDATED ROWs ===================');
+					log(grid[rowIndex]);
+					log('================= UPDATED ROWs ===================');
 
 					for ( var r = 0; r < rowNum; r++ ) {
 						for ( var c = 0; c < 4; c++ ) {
 
+
+							if( grid[r][c] === 'filled' ){
+
+								newRow = r+=1;
+								grid[newRow][c] = 'filled';
+
+								grid[r][c] = 'empty';
+							}
+
+
 							if( sq[r][c].children.length !== 0 ) {
-								log(sq[r][c].children[0]);
+
+								//log(sq[r][c].children[0]);
 								activeChild = sq[r][c].children[0];
 								newRow = r+=1;
+
+								sq[r][c].removeChild( activeChild );
 								sq[newRow][c].addChild( activeChild );
 							}
+
+
+
+
 						}
 					}
 
 
 
 				}
+
 
 
 				rowIndex = 0;
@@ -223,6 +245,14 @@ function init() {
 
 
 		log( 'STAGE CHILDREN : ' + stage.children.length);
+
+		sq[1][0].interactive = true;
+
+		sq[1][0].on('pointerup', function(e){
+			log('CLICKED DEBUG SQUARE');
+			log(grid);
+			ticker.stop();
+		});
 
 		ticker.start();
 	}
