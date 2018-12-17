@@ -57,7 +57,7 @@ function init() {
 
 	var ticker 	= new PIXI.ticker.Ticker({ autoStart : false});
 	//ticker.FPS = 0.5;
-	ticker.speed = 0.15;
+	ticker.speed = 0.05;
 
 
 	var manager = new PIXI.interaction.InteractionManager(app);
@@ -87,6 +87,7 @@ function init() {
 	var gridIndex = 0;
 	var columnIndex = 2;
 	var newRow;
+	var controlLock = false;
 
 	function isFilled(i) {
 		return i === 'filled';
@@ -94,15 +95,19 @@ function init() {
 
 	function handleBlocks(delta) {
 
-		dRate += delta;
+		dRate += Math.ceil(delta);
 
-		if (dRate >= 4) {
-
+		if (dRate === 40) {
+			controlLock = true;
 			if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 
 				rowIndex++;
+
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
+				sq[rowIndex-1][columnIndex+1].removeChild(blocks[blockIndex+1]);
+
 				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
+				sq[rowIndex][columnIndex+1].addChild(blocks[blockIndex+1]);
 
 			} else {
 
@@ -112,7 +117,6 @@ function init() {
 					log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 					ticker.stop();
 				}
-
 				if ( grid[rowIndex].every(isFilled) ) {
 
 					for (var i = 0; i < 4; i++) {
@@ -122,8 +126,10 @@ function init() {
 
 					//moveDown();
 					// MOVE ALL THE PIECES DOWN
+
 					for (var r = rowNum - 1; r >= 0; r--) {
 						for (c = 4 - 1; c >= 0; c--) {
+
 							if( sq[r][c].children.length != 0 ) {
 								activeChild = sq[r][c].children[0];
 								newRow = r+=1;
@@ -142,11 +148,12 @@ function init() {
 
 				rowIndex = 0;
 				blockIndex++;
-				//columnIndex = Utils.random(0,3);
 
 			}
 
 			dRate = 0;
+			controlLock = false;
+
 		}
 	}
 
@@ -243,29 +250,19 @@ function init() {
 		//log('key down');
 		if(e.keyCode == 37) {
 			log('LEFT ARROW');
-			if( columnIndex > 0) {
+			log('CONTROL LOCK = ' + controlLock );
+			if( columnIndex > 0 && controlLock === false) {
 				columnIndex--;
 			}
 		}
 		if(e.keyCode == 39) {
 			log('RIGHT ARROW');
-			if( columnIndex < 3) {
+			log('CONTROL LOCK = ' + controlLock );
+			if( columnIndex < 3 && controlLock === false) {
 				columnIndex++;
 			}
 		}
 	})
-
-
-	$('document').keydown(function(e){
-		log('ley down');
-		if(e.keyCode == 37) {
-			log('LEFT ARROW');
-		}
-	})
-
-
-
-
 
 	ticker.add( function(delta){
 		//log('tick');
@@ -296,20 +293,20 @@ function init() {
 		if(_alpha > 200) {
 			clearTimeout(leftTimer);
 			leftTimer = setTimeout(function() {
-				if( columnIndex > 0) {
+				if( columnIndex > 0 && controlLock === false) {
 					columnIndex--;
 				}
-			}, 100);
+			}, 50);
 
 		}
 
 		if(_alpha < 170) {
 			clearTimeout(rightTimer);
 			rightTimer = setTimeout(function() {
-				if( columnIndex < 3) {
+				if( columnIndex < 3 && controlLock === false) {
 					columnIndex++;
 				}
-			}, 100);
+			}, 50);
 		}
 
 
