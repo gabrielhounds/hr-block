@@ -95,7 +95,7 @@ function init() {
 
 		dRate += delta;
 
-		if (dRate >= 2) {
+		if (dRate >= 4) {
 			if (rowIndex < sq.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 				
 				log(' MOVE DOWN ');
@@ -124,11 +124,32 @@ function init() {
 					
 					for (var i = 0; i < 4; i++) {
 						sq[rowIndex][i].removeChild(sq[rowIndex][i].children[0]);
+						grid[rowIndex][i] = 'empty';
 					}
 					
 					for ( var r = 0; r < rowNum; r++ ) {
 						for ( var c = 0; c < 4; c++ ) {
+						// TODO: MOVE BLOCKS DOWN
+						
+						//if (grid[r][c] === 'filled')
+						
+						if( sq[r][c].children.length !== 0 ) {
+							// DO NOTHING
 							
+							log(sq[r][c].children[0]);
+							
+							activeChild = sq[r][c].children[0];
+							
+							newRow = r+=1;
+							
+							sq[newRow][c].addChild( activeChild );
+							grid[r][c] = 'empty';
+							grid[newRow][c] = 'filled';
+
+						}
+
+						
+						
 						}
 					}
 				}
@@ -144,26 +165,7 @@ function init() {
 		}
 	}
 	
-	/*
-	for ( var r = 0; r < rowNum; r++ ) {
-		for ( var c = 0; c < 4; c++ ) {
-			if ( grid[r][c] !== 'empty' ) {
-				log('NOT EMPTY');
-			}
-		}
-	}
 	
-	for (var i = 0; i < 4; i++) {
-			if( grid[rowIndex][i] === 'filled') {
-				log('========== --------- FULL ROW ---------- ==========');
-				ticker.stop();
-			}
-		}
-	
-	*/
-
-
-
 	function setPosition() {
 		log('setPosition');
 
@@ -262,6 +264,35 @@ function init() {
 
 		]).on('progress', loadProgressHandler).load(setUp);
 	}
+	
+	
+	$(document).on('keydown', function(e){
+		//log('key down');
+		if(e.keyCode == 37) {
+			log('LEFT ARROW');
+			if( columnIndex > 0) {
+				columnIndex--;
+			}
+		}
+		if(e.keyCode == 39) {
+			log('RIGHT ARROW');
+			if( columnIndex < 3) {
+				columnIndex++;
+			}
+		}
+	})
+	
+	
+	$('document').keydown(function(e){
+		log('ley down');
+		if(e.keyCode == 37) {
+			log('LEFT ARROW');
+		}
+	})
+	
+
+	
+	
 
 	ticker.add( function(delta){
 		//log('tick');
