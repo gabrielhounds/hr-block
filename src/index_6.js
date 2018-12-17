@@ -95,8 +95,9 @@ function init() {
 
 		dRate += delta;
 
-		if (dRate >= 4) {
+		if (dRate >= 2) {
 			if (rowIndex < sq.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
+				
 				log(' MOVE DOWN ');
 					
 				log(grid[rowIndex][columnIndex]);
@@ -105,8 +106,6 @@ function init() {
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);			
 				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 					
-				
-				
 			} else {
 				
 				log('OCCUPIED GRID | ROW : ' + rowIndex + ' COLUMNS : ' + columnIndex);
@@ -119,16 +118,28 @@ function init() {
 					ticker.stop();
 				}
 				
-				log('FULL ROW = ' + grid[rowIndex].every(isRowFilled));
-								
+				if (grid[rowIndex].every(isRowFilled)) {
+					
+					log('================= FULL ROW ===================');
+					
+					for (var i = 0; i < 4; i++) {
+						sq[rowIndex][i].removeChild(sq[rowIndex][i].children[0]);
+					}
+					
+					for ( var r = 0; r < rowNum; r++ ) {
+						for ( var c = 0; c < 4; c++ ) {
+							
+						}
+					}
+				}
+				
+												
 				rowIndex = 0;
 				blockIndex++;
 				columnIndex = Utils.random(0,3);
 				
 			}
-			
-			
-			
+						
 			dRate = 0;
 		}
 	}
