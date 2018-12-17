@@ -87,9 +87,33 @@ function init() {
 	var gridIndex = 0;
 	var columnIndex = 1;
 
-	function isRowFilled(i) {
+	function isFilled(i) {
 		return i === 'filled';
 	}
+
+
+	function moveDown() {
+		log('MOVE PIECES DOWN');
+		for (var r = rowNum - 1; r >= 0; r--) {
+			for (c = 4 - 1; c >= 0; c--) {
+				if( sq[r][c].children.length != 0 ) {
+					activeChild = sq[r][c].children[0];
+					newRow = r+=1;
+					sq[r][c].removeChild( activeChild );
+					sq[newRow][c].addChild( activeChild );
+				}
+
+				if (grid[r][c] === 'filled') {
+					grid[r][c] = 'empty';
+					newRow = r+=1;
+					grid[newRow][c] = 'filled';
+				}
+
+
+			}
+		}
+	}
+
 
 	function handleBlocks(delta) {
 
@@ -98,9 +122,9 @@ function init() {
 		if (dRate >= 4) {
 			if (rowIndex < sq.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 
-				log(' MOVE DOWN ');
+				log(' TICK DOWN ');
 
-				log(grid[rowIndex][columnIndex]);
+				//log(grid[rowIndex][columnIndex]);
 
 				rowIndex++;
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
@@ -120,33 +144,14 @@ function init() {
 
 				//ticker.stop();
 
-				if ( grid[rowIndex].every(isRowFilled) ) {
+				if ( grid[rowIndex].every(isFilled) ) {
 
 					for (var i = 0; i < 4; i++) {
-						sq[rowIndex][i].removeChild(sq[rowIndex][i].children[0]);
+						sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
 						grid[rowIndex][i] = 'empty';
 					}
 
-
-					for ( var r = 0; r < rowNum; r++ ) {
-						for ( var c = 0; c < 4; c++ ) {
-
-							if( grid[r][c] === 'filled' ){
-								grid[r][c] = 'empty';
-								newRow = r+=1;
-								grid[newRow][c] = 'filled';
-
-								//activeChild = sq[r][c].children[0];
-
-								//sq[r][c].removeChild( activeChild );
-								//sq[newRow][c].addChild( activeChild );
-
-							}
-
-						}
-					}
-
-
+					moveDown();
 
 				}
 
