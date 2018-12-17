@@ -92,30 +92,6 @@ function init() {
 		return i === 'filled';
 	}
 
-
-	function moveDown() {
-		log('MOVE PIECES DOWN');
-		for (var r = rowNum - 1; r >= 0; r--) {
-			for (c = 4 - 1; c >= 0; c--) {
-				if( sq[r][c].children.length != 0 ) {
-					activeChild = sq[r][c].children[0];
-					newRow = r+=1;
-					sq[r][c].removeChild( activeChild );
-					sq[newRow][c].addChild( activeChild );
-				}
-
-				if (grid[r][c] === 'filled') {
-					grid[r][c] = 'empty';
-					newRow = r+=1;
-					grid[newRow][c] = 'filled';
-				}
-
-
-			}
-		}
-	}
-
-
 	function handleBlocks(delta) {
 
 		dRate += delta;
@@ -296,13 +272,49 @@ function init() {
 		handleBlocks(delta);
 	});
 
+	var leftTimer, rightTimer;
+
 	window.addEventListener('deviceorientation', function(e) {
 
 		alpha 	= Math.round(e.alpha);
 		beta 	= Math.round(e.beta);
 		gamma 	= Math.round(e.gamma);
 
-		$(debugText).html('ALPHA : ' + alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
+
+
+		if (alpha < 180) {
+			_alpha = alpha + 180;
+		} else {
+			_alpha = alpha - 180;
+		}
+
+
+		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
+
+
+
+		if(_alpha > 200) {
+			clearTimeout(leftTimer);
+			leftTimer = setTimeout(function() {
+				if( columnIndex > 0) {
+					columnIndex--;
+				}
+			}, 100);
+
+		}
+
+		if(_alpha < 170) {
+			clearTimeout(rightTimer);
+			rightTimer = setTimeout(function() {
+				if( columnIndex < 3) {
+					columnIndex++;
+				}
+			}, 100);
+		}
+
+
+
+
 
 	});
 
