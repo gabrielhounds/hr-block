@@ -5,7 +5,7 @@
 function init() {
 	var log = console.log;
 	log('init');
-	
+
 	var t = TweenMax;
 
 	var Application = PIXI.Application,
@@ -34,14 +34,47 @@ function init() {
 	var rowNum;
 	var gridHeight;
 
-	var currentMousePos = { x: -1, y: -1 };
+	var footer; // = $('<div>', { id : 'footer'}).appendTo('body');
+	var footerHeight;
 
+	var introOverlay;
+	var introOverlayHeight;
+
+	var currentMousePos = { x: -1, y: -1 };
 
 	var main = $('#main');
 
 	var game = $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
 
+	footer = $('<div>', { id : 'footer'}).appendTo(main);
+	introOverlay = $('<div>', { id : 'introOverlay'}).appendTo(main);
+
 	var debugText = $('<div id="debugText"></div>').appendTo(main);
+
+	var instructions = $('<div>', { id : 'instructions'}).appendTo(introOverlay);
+	var phoneIcon = $('<div>', { id : 'phoneIcon'}).appendTo(instructions);
+	var instructionText = $('<div>', { id : 'instructionText'}).appendTo(instructions);
+
+	var cta = $('<div>', { id : 'cta'}).appendTo(footer);
+	var logo = $('<div>', { id : 'logo'}).appendTo(footer);
+
+	var endFrame = $('<div>', { id : 'endFrame'}).appendTo(main);
+	var endHeader = $('<div>', { id : 'endHeader'}).appendTo(endFrame);
+
+	var endSubHead = $('<div>', { id : 'endSubHead'}).appendTo(endFrame);
+
+	var replayBtn = $('<div>', { id : 'replayBtn'}).appendTo(endFrame);
+
+	var tagLine = $('<div>', { id : 'tagLine'}).appendTo(endFrame);
+
+	var endCta = $('<div>', { id : 'endCta'}).appendTo(endFrame);
+
+	var endLogo = $('<div>', { id : 'endLogo'}).appendTo(endFrame);
+
+	t.set(endFrame, {autoAlpha:0});
+
+
+	var tlPhone = new TimelineMax({ repeat:10 });
 
 	$(debugText).html('TEST');
 
@@ -91,28 +124,30 @@ function init() {
 	var newRow;
 	var controlLock = false;
 	var nextColumnIndex = columnIndex;
-	
+
 	var theShape;
-	
+
+
+
 	theShape = Utils.random(0, 2);
-	
+
 
 	function isFilled(i) {
 		return i === 'filled';
 	}
-	
+
 	function handleRowDrop() {
 		for (var i = 0; i < 4; i++) {
 			sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
 			grid[rowIndex][i] = 'empty';
 		}
-		
+
 		//for (var r = rowNum - 1; r >= 0; r--) {
 		//	for (c = 4 - 1; c >= 0; c--) {
-		
+
 		for (var r = rowNum - 2; r >= 0; r--) {
 			for (c = 4 - 1; c >= 0; c--) {
-				
+
 				if( sq[r][c].children.length !== 0 ) {
 					log('CHILDREN LENGTH ' + ' ROW ' +[r] + ' COLUMN ' + [c] + '  ' + sq[r][c].children.length )
 					activeChild = sq[r][c].children[0];
@@ -126,7 +161,7 @@ function init() {
 					newRow = r+=1;
 					grid[newRow][c] = 'filled';
 				}
-			} 
+			}
 		}
 		ticker.start();
 	}
@@ -134,26 +169,26 @@ function init() {
 	function handleBlocks(delta) {
 
 		dRate += Math.ceil(delta);
-		
+
 		if (dRate >= 60) {
 			// SINGLE SQUARE
 			if (theShape === 0) {
 				log('SINGLE SQUARE');
-				
+
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 					rowIndex++;
 					columnIndex = nextColumnIndex;
 					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
-					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);				
+					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 				} else {
-					grid[rowIndex][columnIndex] = 'filled';			
+					grid[rowIndex][columnIndex] = 'filled';
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
 						ticker.stop();
-						handleRowDrop();					
+						handleRowDrop();
 					}
 					rowIndex = 0;
 					blockIndex++;
@@ -164,35 +199,35 @@ function init() {
 			// TRIPLE SQUARE
 			} else if (theShape === 1) {
 				log('TRIPLE SQUARE');
-				
+
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex + 1][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
-					
+
 					columnIndex = nextColumnIndex;
-					
+
 					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
 					sq[rowIndex-1][columnIndex+1].removeChild(blocks[blockIndex+1]);
 					//sq[rowIndex-1][columnIndex+2].removeChild(blocks[blockIndex+2]);
-	
-	
+
+
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 					sq[rowIndex][columnIndex+1].addChild(blocks[blockIndex+1]);
-					//sq[rowIndex][columnIndex+2].addChild(blocks[blockIndex+2]);	
-	
-								
+					//sq[rowIndex][columnIndex+2].addChild(blocks[blockIndex+2]);
+
+
 				} else {
-					grid[rowIndex][columnIndex] = 'filled';	
+					grid[rowIndex][columnIndex] = 'filled';
 					grid[rowIndex][columnIndex+1] = 'filled';
 					//grid[rowIndex][columnIndex+2] = 'filled';
-	
-								
+
+
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
 						ticker.stop();
-						handleRowDrop();					
+						handleRowDrop();
 					}
 					rowIndex = 0;
 					blockIndex+=3;
@@ -203,30 +238,30 @@ function init() {
 			// CADDY SQUARE
 			} else if (theShape === 2) {
 				log('CADDY SQUARE');
-				
+
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
-					
+
 					columnIndex = nextColumnIndex;
-					
+
 					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
 					sq[rowIndex][columnIndex+1].removeChild(blocks[blockIndex+1]);
-	
+
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
-					sq[rowIndex-1][columnIndex+1].addChild(blocks[blockIndex+1]);	
-								
+					sq[rowIndex-1][columnIndex+1].addChild(blocks[blockIndex+1]);
+
 				} else {
-					
-					grid[rowIndex][columnIndex] = 'filled';	
+
+					grid[rowIndex][columnIndex] = 'filled';
 					grid[rowIndex-1][columnIndex+1] = 'filled';
-								
+
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
 						ticker.stop();
-						handleRowDrop();					
+						handleRowDrop();
 					}
 					rowIndex = 0;
 					blockIndex+=2;
@@ -235,13 +270,13 @@ function init() {
 					theShape = Utils.random(0, 2);
 				}
 			}
-			
-			
+
+
 			dRate = 0;
-			
-			
+
+
 		}
-		
+
 	}
 
 
@@ -286,6 +321,24 @@ function init() {
 		gameBoard.y = -gridWidth;
 		stage.addChild(gameBoard);
 
+		footerHeight = (_height - gameBoard.height) + gridWidth;
+		introOverlayHeight = (_height - footerHeight)
+
+		$(footer).css({ height : footerHeight });
+		$(introOverlay).css({ height : introOverlayHeight });
+
+		function resetPhone() {
+			t.set(phoneIcon, {rotation:'0deg'})
+		}
+
+		t.set(phoneIcon, {rotation:'-45deg'})
+
+		tlPhone.add('begin')
+		.to(phoneIcon, 0.9, {rotation:'+=90', ease:Quad.easeOut})
+		.to(phoneIcon, 0.9, {rotation:'-=90', ease:Quad.easeOut, onComplete:resetPhone})
+
+
+
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 
@@ -301,6 +354,8 @@ function init() {
 	function createBlock() {
 
 	}
+
+
 
 
 	function setUp() {
@@ -366,8 +421,6 @@ function init() {
 		beta 	= Math.round(e.beta);
 		gamma 	= Math.round(e.gamma);
 
-
-
 		if (alpha < 180) {
 			_alpha = alpha + 180;
 		} else {
@@ -377,8 +430,6 @@ function init() {
 
 		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
 
-
-
 		if(_alpha > 200) {
 			clearTimeout(leftTimer);
 			leftTimer = setTimeout(function() {
@@ -386,7 +437,6 @@ function init() {
 					columnIndex--;
 				}
 			}, 50);
-
 		}
 
 		if(_alpha < 170) {
@@ -397,10 +447,6 @@ function init() {
 				}
 			}, 50);
 		}
-
-
-
-
 
 	});
 
