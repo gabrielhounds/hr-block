@@ -127,8 +127,6 @@ function init() {
 
 	var theShape;
 
-
-
 	theShape = Utils.random(0, 2);
 
 
@@ -136,14 +134,15 @@ function init() {
 		return i === 'filled';
 	}
 
+	function handleGameOver() {
+		t.set(endFrame, {autoAlpha:1});
+	}
+
 	function handleRowDrop() {
 		for (var i = 0; i < 4; i++) {
 			sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
 			grid[rowIndex][i] = 'empty';
 		}
-
-		//for (var r = rowNum - 1; r >= 0; r--) {
-		//	for (c = 4 - 1; c >= 0; c--) {
 
 		for (var r = rowNum - 2; r >= 0; r--) {
 			for (c = 4 - 1; c >= 0; c--) {
@@ -184,6 +183,7 @@ function init() {
 					grid[rowIndex][columnIndex] = 'filled';
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
+						handleGameOver();
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
@@ -223,6 +223,7 @@ function init() {
 
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
+						handleGameOver();
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
@@ -257,6 +258,7 @@ function init() {
 
 					if (rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
+						handleGameOver();
 						ticker.stop();
 					}
 					if ( grid[rowIndex].every(isFilled) ) {
@@ -348,15 +350,17 @@ function init() {
 			ticker.stop();
 		});
 
-		ticker.start();
+
+		$(introOverlay).click( function(e) {
+			t.set(introOverlay, {autoAlpha:0});
+			ticker.start();
+		})
+		//ticker.start();
 	}
 
 	function createBlock() {
 
 	}
-
-
-
 
 	function setUp() {
 		log('setup');
@@ -406,7 +410,7 @@ function init() {
 				nextColumnIndex++;
 			}
 		}
-	})
+	});
 
 	ticker.add( function(delta){
 		//log('tick');
@@ -427,14 +431,13 @@ function init() {
 			_alpha = alpha - 180;
 		}
 
-
 		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
 
 		if(_alpha > 200) {
 			clearTimeout(leftTimer);
 			leftTimer = setTimeout(function() {
 				if( columnIndex > 0 && controlLock === false) {
-					columnIndex--;
+					nextColumnIndex--;
 				}
 			}, 50);
 		}
@@ -443,7 +446,7 @@ function init() {
 			clearTimeout(rightTimer);
 			rightTimer = setTimeout(function() {
 				if( columnIndex < 3 && controlLock === false) {
-					columnIndex++;
+					nextColumnIndex++;
 				}
 			}, 50);
 		}
