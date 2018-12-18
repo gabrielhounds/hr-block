@@ -7,80 +7,67 @@ function init() {
 	log('init');
 
 	var t = TweenMax;
+	var tlPhone = new TimelineMax({ repeat:10 });
 
 	var Application = PIXI.Application,
 	loader 			= PIXI.loader,
 	resources 		= PIXI.loader.resources,
 	Sprite 			= PIXI.Sprite;
 
-	var app, resizeTimer;
+	var stage, ticker, manager, app, resizeTimer,
+	alpha, beta, gamma,
 
-	var alpha, beta, gamma;
+	blocks0, blocks1, blocks2, line, gameBoard,
+	blockImg0, blockImg1,
+	gridWidth, gridHeight, rowNum;
 
-	var blocks0, blocks1, blocks2, line, gameBoard;
+	var grid = [],
+	blocks = [],
+	sq = [];
 
-	var blockImg0, blockImg1;
-
-	var columnLine = [];
-	var rowLine = [];
-
-	var grid = [];
-	var blocks = [];
-
-	var sq = [];
-	var gd = [];
-
-	var gridWidth;
-	var rowNum;
-	var gridHeight;
-
-	var footer; // = $('<div>', { id : 'footer'}).appendTo('body');
-	var footerHeight;
 
 	var introOverlay;
 	var introOverlayHeight;
-
 	var currentMousePos = { x: -1, y: -1 };
 
-	var main = $('#main');
+	var main 			= $('#main');
 
-	var game = $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
+	var game 			= $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
 
-	footer = $('<div>', { id : 'footer'}).appendTo(main);
-	introOverlay = $('<div>', { id : 'introOverlay'}).appendTo(main);
+	var footer 			= $('<div>', { id : 'footer'}).appendTo(main);
+	var scoreTab 		= $('<div>', { id : 'scoreTab'}).appendTo(main);
+	var timeText 		= $('<div>', { id : 'timeText'}).appendTo(scoreTab);
+	var scoreText 		= $('<div>', { id : 'scoreText'}).appendTo(scoreTab);
 
-	var debugText = $('<div id="debugText"></div>').appendTo(main);
+	var introOverlay 	= $('<div>', { id : 'introOverlay'}).appendTo(main);
 
-	var instructions = $('<div>', { id : 'instructions'}).appendTo(introOverlay);
-	var phoneIcon = $('<div>', { id : 'phoneIcon'}).appendTo(instructions);
+	var debugText 		= $('<div id="debugText"></div>').appendTo(main);
+
+	var instructions 	= $('<div>', { id : 'instructions'}).appendTo(introOverlay);
+	var phoneIcon 		= $('<div>', { id : 'phoneIcon'}).appendTo(instructions);
 	var instructionText = $('<div>', { id : 'instructionText'}).appendTo(instructions);
 
-	var cta = $('<div>', { id : 'cta'}).appendTo(footer);
-	var logo = $('<div>', { id : 'logo'}).appendTo(footer);
+	var cta 			= $('<div>', { id : 'cta'}).appendTo(footer);
+	var logo 			= $('<div>', { id : 'logo'}).appendTo(footer);
 
-	var endFrame = $('<div>', { id : 'endFrame'}).appendTo(main);
-	var endHeader = $('<div>', { id : 'endHeader'}).appendTo(endFrame);
-
-	var endSubHead = $('<div>', { id : 'endSubHead'}).appendTo(endFrame);
-
-	var replayBtn = $('<div>', { id : 'replayBtn'}).appendTo(endFrame);
-
-	var tagLine = $('<div>', { id : 'tagLine'}).appendTo(endFrame);
-
-	var endCta = $('<div>', { id : 'endCta'}).appendTo(endFrame);
-
-	var endLogo = $('<div>', { id : 'endLogo'}).appendTo(endFrame);
+	var endFrame 		= $('<div>', { id : 'endFrame'}).appendTo(main);
+	var endHeader 		= $('<div>', { id : 'endHeader'}).appendTo(endFrame);
+	var endSubHead 		= $('<div>', { id : 'endSubHead'}).appendTo(endFrame);
+	var replayBtn 		= $('<div>', { id : 'replayBtn'}).appendTo(endFrame);
+	var tagLine 		= $('<div>', { id : 'tagLine'}).appendTo(endFrame);
+	var endCta 			= $('<div>', { id : 'endCta'}).appendTo(endFrame);
+	var endLogo 		= $('<div>', { id : 'endLogo'}).appendTo(endFrame);
 
 	t.set(endFrame, {autoAlpha:0});
-
-
-	var tlPhone = new TimelineMax({ repeat:10 });
+	t.set(scoreTab, {x:-300});
 
 	$(debugText).html('TEST');
+	$(scoreText).html('ROWS : 00');
 
 	var _width = window.innerWidth;
 	var _height = window.innerHeight;
-	var stage, ticker, manager;
+
+
 
 	function initStage() {
 		app = new Application({width : _width, height : _height, legacy : true, transparent : false });
@@ -100,6 +87,7 @@ function init() {
 		ticker.add( function(delta){
 			//log('tick');
 			handleBlocks(delta);
+			handleTimer(delta);
 		});
 
 		initLoader();
@@ -133,11 +121,8 @@ function init() {
 	var newRow;
 	var controlLock = false;
 	var nextColumnIndex = columnIndex;
-
+	var columnOffset = 0;
 	var theShape = Utils.random(0, 2);
-
-	//theShape = Utils.random(0, 2);
-
 
 	function isFilled(i) {
 		return i === 'filled';
@@ -171,6 +156,9 @@ function init() {
 				}
 			}
 		}
+
+		score += 1;
+		handleScore();
 		ticker.start();
 	}
 
@@ -183,11 +171,11 @@ function init() {
 			// SINGLE SQUARE
 			if (theShape === 0) {
 				log('SINGLE SQUARE');
-
+				columnOffset = 0;
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
 					rowIndex++;
 					columnIndex = nextColumnIndex;
-					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
+					//sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 				} else {
 					grid[rowIndex][columnIndex] = 'filled';
@@ -209,14 +197,14 @@ function init() {
 			// TRIPLE SQUARE
 			} else if (theShape === 1) {
 				log('TRIPLE SQUARE');
-
+				columnOffset = 1;
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex + 1][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
 
 					columnIndex = nextColumnIndex;
 
-					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
-					sq[rowIndex-1][columnIndex+1].removeChild(blocks[blockIndex+1]);
+					//sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
+					//sq[rowIndex-1][columnIndex+1].removeChild(blocks[blockIndex+1]);
 					//sq[rowIndex-1][columnIndex+2].removeChild(blocks[blockIndex+2]);
 
 
@@ -249,14 +237,14 @@ function init() {
 			// CADDY SQUARE
 			} else if (theShape === 2) {
 				log('CADDY SQUARE');
-
+				columnOffset = 1;
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
 
 					columnIndex = nextColumnIndex;
 
-					sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
-					sq[rowIndex][columnIndex+1].removeChild(blocks[blockIndex+1]);
+					//sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
+					//sq[rowIndex][columnIndex+1].removeChild(blocks[blockIndex+1]);
 
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 					sq[rowIndex-1][columnIndex+1].addChild(blocks[blockIndex+1]);
@@ -289,6 +277,26 @@ function init() {
 
 	}
 
+	var theTime = 30, tRate;
+
+	var score = 0;
+
+	function handleTimer(delta) {
+
+		tRate = delta / 60;
+		theTime -= tRate;
+
+		$(timeText).html('TIME : ' + Math.round(theTime));
+	}
+
+	function handleScore() {
+		if (score < 10 ) {
+			$(scoreText).html('ROWS : 0' + score);
+		} else {
+			$(scoreText).html('ROWS : '+ score);
+		}
+
+	}
 
 	function setPosition() {
 		log('setPosition');
@@ -319,7 +327,7 @@ function init() {
 			for (c = 0; c < 4; c++) {
 				sq[r][c] = new PIXI.Graphics();
 				sq[r][c].beginFill(0x66CCFf, 0);
-				sq[r][c].lineStyle(1, 0x000000, 0.05);
+				sq[r][c].lineStyle(1, 0x000000, 0.01);
 				sq[r][c].drawRect(0, 0, gridWidth, gridHeight);
 				sq[r][c].endFill();
 				sq[r][c].x = _width / 4 * c;
@@ -347,8 +355,6 @@ function init() {
 		.to(phoneIcon, 0.9, {rotation:'+=90', ease:Quad.easeOut})
 		.to(phoneIcon, 0.9, {rotation:'-=90', ease:Quad.easeOut, onComplete:resetPhone})
 
-
-
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 
@@ -358,24 +364,47 @@ function init() {
 			ticker.stop();
 		});
 
-
 		$(introOverlay).click( function(e) {
+
 			ticker.stop();
 
-			$(game).empty();
+
+
+			for ( var r = 0; r < rowNum; r++ ) {
+				for ( var c = 0; c < 4; c++ ) {
+					sq[r][c].removeChild(sq[r][c].children[0]);
+					grid[r][c] = 'empty';
+				}
+
+			}
+
+
 			for (var i = stage.children.length - 1; i >= 0; i--) {
 				stage.removeChild(stage.children[i]);
 			};
 
+			dRate = 0;
+			dTick = 0;
+			blockIndex = 0;
+			rowIndex = 0;
+			gridIndex = 0;
+			columnIndex = 1;
+			theTime = 30;
+			score = 0;
+
+			t.to(scoreTab, 0.3, {x:0, ease:Power3.easeOut});
+			t.to(introOverlay, 0.3, {autoAlpha:0});
+
 			setPosition();
 
-			t.set(introOverlay, {autoAlpha:0});
+
 
 			//initStage();
 			//setUp();
 
 			//ticker.start();
 		})
+
 		ticker.start();
 	}
 
@@ -418,17 +447,29 @@ function init() {
 		if(e.keyCode == 37) {
 			log('LEFT ARROW');
 			log('CONTROL LOCK = ' + controlLock );
-			if( columnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled') {
-				//columnIndex--;
-				nextColumnIndex--;
+			//if( columnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled') {
+
+			if( nextColumnIndex > 0) {
+				if(nextColumnIndex < 0) {
+					nextColumnIndex = 0;
+				} else {
+					nextColumnIndex--;
+				}
+				//$(debugText).html('NEXT COLUMN = ' + nextColumnIndex);
 			}
 		}
+
 		if(e.keyCode == 39) {
 			log('RIGHT ARROW');
 			log('CONTROL LOCK = ' + controlLock );
-			if( columnIndex < 3 && grid[rowIndex+1][columnIndex+1] !== 'filled') {
-				//columnIndex++;
-				nextColumnIndex++;
+
+			if( nextColumnIndex < 3 - columnOffset) {
+				if (nextColumnIndex - columnOffset > 3) {
+					nextColumnIndex = 3 - columnOffset;
+				} else {
+					nextColumnIndex++;
+				}
+				//$(debugText).html('NEXT COLUMN = ' + nextColumnIndex);
 			}
 		}
 	});
@@ -449,22 +490,32 @@ function init() {
 			_alpha = alpha - 180;
 		}
 
-		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma);
+		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma + '<br>' + 'MOVE TRIGGERED? : ');
 
-		if(_alpha > 200) {
+		if(_alpha >= 220) {
 			clearTimeout(leftTimer);
 			leftTimer = setTimeout(function() {
-				if( columnIndex > 0 && controlLock === false) {
-					nextColumnIndex--;
+				if( nextColumnIndex > 0) {
+					if(nextColumnIndex < 0) {
+						nextColumnIndex = 0;
+					} else {
+						nextColumnIndex--;
+					}
+					//$(debugText).html('NEXT COLUMN = ' + nextColumnIndex);
 				}
 			}, 50);
 		}
 
-		if(_alpha < 170) {
+		if(_alpha <= 120) {
 			clearTimeout(rightTimer);
 			rightTimer = setTimeout(function() {
-				if( columnIndex < 3 && controlLock === false) {
-					nextColumnIndex++;
+				if( nextColumnIndex < 3 - columnOffset) {
+					if (nextColumnIndex - columnOffset > 3) {
+						nextColumnIndex = 3 - columnOffset;
+					} else {
+						nextColumnIndex++;
+					}
+					//$(debugText).html('NEXT COLUMN = ' + nextColumnIndex);
 				}
 			}, 50);
 		}

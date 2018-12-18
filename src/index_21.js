@@ -347,8 +347,6 @@ function init() {
 		.to(phoneIcon, 0.9, {rotation:'+=90', ease:Quad.easeOut})
 		.to(phoneIcon, 0.9, {rotation:'-=90', ease:Quad.easeOut, onComplete:resetPhone})
 
-
-
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 
@@ -358,24 +356,42 @@ function init() {
 			ticker.stop();
 		});
 
-
 		$(introOverlay).click( function(e) {
+
 			ticker.stop();
 
-			$(game).empty();
+			t.set(introOverlay, {autoAlpha:0});
+
+			for ( var r = 0; r < rowNum; r++ ) {
+				for ( var c = 0; c < 4; c++ ) {
+					sq[r][c].removeChild(sq[r][c].children[0]);
+					grid[r][c] = 'empty';
+				}
+
+			}
+
+
 			for (var i = stage.children.length - 1; i >= 0; i--) {
 				stage.removeChild(stage.children[i]);
 			};
 
+			dRate = 0;
+			dTick = 0;
+			blockIndex = 0;
+			rowIndex = 0;
+			gridIndex = 0;
+			columnIndex = 1;
+
 			setPosition();
 
-			t.set(introOverlay, {autoAlpha:0});
+
 
 			//initStage();
 			//setUp();
 
 			//ticker.start();
 		})
+
 		ticker.start();
 	}
 
