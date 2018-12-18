@@ -5,6 +5,8 @@
 function init() {
 	var log = console.log;
 	log('init');
+	
+	var t = TweenMax;
 
 	var Application = PIXI.Application,
 	loader 			= PIXI.loader,
@@ -57,7 +59,7 @@ function init() {
 
 	var ticker 	= new PIXI.ticker.Ticker({ autoStart : false});
 	//ticker.FPS = 0.5;
-	ticker.speed = 0.05;
+	ticker.speed = 1.0;
 
 
 	var manager = new PIXI.interaction.InteractionManager(app);
@@ -88,72 +90,63 @@ function init() {
 	var columnIndex = 2;
 	var newRow;
 	var controlLock = false;
+	var nextColumnIndex = columnIndex;
+	
 
 	function isFilled(i) {
 		return i === 'filled';
+	}
+	
+	function handleRowDrop() {
+		for (var i = 0; i < 4; i++) {
+			sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
+			grid[rowIndex][i] = 'empty';
+		}
+		
+		for (var r = rowNum - 1; r >= 0; r--) {
+			for (c = 4 - 1; c >= 0; c--) {
+				
+				if( sq[r][c].children.length != 0 ) {
+					activeChild = sq[r][c].children[0];
+					newRow = r+=1;
+					sq[r][c].removeChild( activeChild );
+					sq[newRow][c].addChild( activeChild );
+				}
+
+				if (grid[r][c] === 'filled') {
+					grid[r][c] = 'empty';
+					newRow = r+=1;
+					grid[newRow][c] = 'filled';
+				}
+			}
+		}
+		ticker.start();
 	}
 
 	function handleBlocks(delta) {
 
 		dRate += Math.ceil(delta);
-
-		if (dRate === 40) {
-			controlLock = true;
+		
+		if (dRate >= 30) {
 			if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled') {
-
 				rowIndex++;
-
+				columnIndex = nextColumnIndex;
 				sq[rowIndex-1][columnIndex].removeChild(blocks[blockIndex]);
-				sq[rowIndex-1][columnIndex+1].removeChild(blocks[blockIndex+1]);
-
-				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
-				sq[rowIndex][columnIndex+1].addChild(blocks[blockIndex+1]);
-
+				sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);				
 			} else {
-
-				grid[rowIndex][columnIndex] = 'filled';
-
+				grid[rowIndex][columnIndex] = 'filled';			
 				if (rowIndex === 1) {
 					log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 					ticker.stop();
 				}
 				if ( grid[rowIndex].every(isFilled) ) {
-
-					for (var i = 0; i < 4; i++) {
-						sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
-						grid[rowIndex][i] = 'empty';
-					}
-
-					//moveDown();
-					// MOVE ALL THE PIECES DOWN
-
-					for (var r = rowNum - 1; r >= 0; r--) {
-						for (c = 4 - 1; c >= 0; c--) {
-
-							if( sq[r][c].children.length != 0 ) {
-								activeChild = sq[r][c].children[0];
-								newRow = r+=1;
-								sq[r][c].removeChild( activeChild );
-								sq[newRow][c].addChild( activeChild );
-							}
-
-							if (grid[r][c] === 'filled') {
-								grid[r][c] = 'empty';
-								newRow = r+=1;
-								grid[newRow][c] = 'filled';
-							}
-						}
-					}
+					ticker.stop();
+					handleRowDrop();					
 				}
-
 				rowIndex = 0;
 				blockIndex++;
-
 			}
-
-			dRate = 0;
-			controlLock = false;
-
+			dRate = 0;			
 		}
 	}
 
@@ -187,7 +180,7 @@ function init() {
 			for (c = 0; c < 4; c++) {
 				sq[r][c] = new PIXI.Graphics();
 				sq[r][c].beginFill(0x66CCFf, 0);
-				sq[r][c].lineStyle(1, 0x000000, 0.1);
+				sq[r][c].lineStyle(1, 0x000000, 0.05);
 				sq[r][c].drawRect(0, 0, gridWidth, gridHeight);
 				sq[r][c].endFill();
 				sq[r][c].x = _width / 4 * c;
@@ -251,15 +244,17 @@ function init() {
 		if(e.keyCode == 37) {
 			log('LEFT ARROW');
 			log('CONTROL LOCK = ' + controlLock );
-			if( columnIndex > 0 && controlLock === false) {
-				columnIndex--;
+			if( columnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled') {
+				//columnIndex--;
+				nextColumnIndex--;
 			}
 		}
 		if(e.keyCode == 39) {
 			log('RIGHT ARROW');
 			log('CONTROL LOCK = ' + controlLock );
-			if( columnIndex < 3 && controlLock === false) {
-				columnIndex++;
+			if( columnIndex < 3 && grid[rowIndex+1][columnIndex+1] !== 'filled') {
+				//columnIndex++;
+				nextColumnIndex++;
 			}
 		}
 	})
