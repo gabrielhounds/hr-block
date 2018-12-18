@@ -126,7 +126,7 @@ function init() {
 					newRow = r+=1;
 					grid[newRow][c] = 'filled';
 				}
-			}
+			} 
 		}
 		ticker.start();
 	}
@@ -135,7 +135,7 @@ function init() {
 
 		dRate += Math.ceil(delta);
 		
-		if (dRate >= 30) {
+		if (dRate >= 60) {
 			// SINGLE SQUARE
 			if (theShape === 0) {
 				log('SINGLE SQUARE');
