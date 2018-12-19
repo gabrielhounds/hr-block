@@ -7,6 +7,8 @@ function init() {
 	var t = TweenMax;
 	var tlPhone = new TimelineMax({ repeat:10 });
 	
+	var endTl = new TimelineMax({paused:true});
+	
 	Utils = (function(){
 		var getMousePosition = function() {
 			return app.renderer.plugins.interaction.mouse.global;
@@ -144,7 +146,21 @@ function init() {
 	}
 		
 	function handleGameOver() {
-		t.set(endFrame, {autoAlpha:1});
+		t.to(endFrame, 0.3, {autoAlpha:1, onComplete: function() { endTl.play(); } });
+		
+		endTl.from(endHeader, 0.3, {y:'-=20', opacity:0})		
+			 .from(endSubHead, 0.3, {y:'-=20', opacity:0}, '-=0.2')
+			 .from(replayBtn, 0.3, {x:'-=20', opacity:0}, '-=0.2')
+			 .from(tagLine, 0.3, {x:'-=20', opacity:0}, '-=0.2')
+			 .from(endCta, 0.3, {y:'+=20', opacity:0}, '-=0.3')
+			 .from(endLogo, 0.3, {y:'+=20', opacity:0}, '-=0.2')
+
+		
+		
+		//endTl.play();
+		
+		
+		
 		
 		var rowText = (score > 1 || score === 0) ? ' Rows.' : ' Row.';
 		
@@ -438,6 +454,12 @@ function init() {
 		tRate = delta / 60;
 		theTime -= tRate;
 		$(timeText).html('TIME : ' + Math.round(theTime));
+		
+		if (Math.round(theTime) <= 0) {
+			//alert('times up. game over');
+			ticker.stop();
+			handleGameOver();
+		}
 	}
 	
 	function handleScore() {
@@ -484,15 +506,29 @@ function init() {
 		stage.addChild(gameBoard);
 		footerHeight = (_height - gameBoard.height) + gridWidth;
 		introOverlayHeight = (_height - footerHeight)
-		$(footer).css({ height : footerHeight });
+		$(footer).css({ height : footerHeight , opacity : 1});
 		$(introOverlay).css({ height : introOverlayHeight });
+		
 		function resetPhone() {
 			t.set(phoneIcon, {rotation:'0deg'})
 		}
-		t.set(phoneIcon, {rotation:'-45deg'})
-		tlPhone.add('begin')
-		.to(phoneIcon, 0.9, {rotation:'+=90', ease:Quad.easeOut})
-		.to(phoneIcon, 0.9, {rotation:'-=90', ease:Quad.easeOut, onComplete:resetPhone})
+		
+		t.from(phoneIcon, 0.9, {scale:0.1, opacity:0, ease:Elastic.easeOut, delay:0.5});
+		t.set(phoneIcon, {rotation:'-45deg'});
+		t.from(instructionText, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
+		
+		
+		t.from(footer, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
+		t.from(logo, 0.3, {x:'-=40', opacity:0, ease:Power3.easeOut, delay:0.8});
+		t.from(cta, 0.3, {x:'+=40', opacity:0, ease:Power3.easeOut, delay:0.8});
+		
+		
+		tlPhone.add('begin')		
+		.to(phoneIcon, 1.9, {rotation:'+=90', ease:Bounce.easeOut})
+		.to(phoneIcon, 1.9, {rotation:'-=90', ease:Bounce.easeOut, onComplete:resetPhone})
+		
+		
+				
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 		sq[1][0].on('pointerup', function(e){
@@ -609,7 +645,7 @@ function init() {
 						nextColumnIndex--;
 					}
 				}
-			}, 50);
+			}, 20);
 		}
 		
 		if(_alpha < 160 && _alpha > 100) {
@@ -622,7 +658,7 @@ function init() {
 						nextColumnIndex++;
 					}
 				}
-			}, 50);
+			}, 20);
 		}
 	});
 	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }
