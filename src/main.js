@@ -540,25 +540,26 @@ function init() {
 		$(footer).css({ height : footerHeight , opacity : 1});
 		$(introOverlay).css({ height : introOverlayHeight });
 		
-		function resetPhone() {
-			t.set(phoneIcon, {rotation:'0deg'})
+		if (intro){
+		
+			function resetPhone() {
+				t.set(phoneIcon, {rotation:'0deg'})
+			}
+		
+			t.from(phoneIcon, 0.9, {scale:0.1, opacity:0, ease:Elastic.easeOut, delay:0.5});
+			t.set(phoneIcon, {rotation:'-45deg'});
+			t.from(instructionText, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
+		
+		
+			t.from(footer, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
+			t.from(logo, 0.3, {x:'-=40', opacity:0, ease:Power3.easeOut, delay:0.8});
+			t.from(cta, 0.3, {x:'+=40', opacity:0, ease:Power3.easeOut, delay:0.8});
+			
+			tlPhone.add('begin')		
+			.to(phoneIcon, 1.9, {rotation:'+=90', ease:Bounce.easeOut})
+			.to(phoneIcon, 1.9, {rotation:'-=90', ease:Bounce.easeOut, onComplete:resetPhone})
+			.add('end');
 		}
-		
-		t.from(phoneIcon, 0.9, {scale:0.1, opacity:0, ease:Elastic.easeOut, delay:0.5});
-		t.set(phoneIcon, {rotation:'-45deg'});
-		t.from(instructionText, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
-		
-		
-		t.from(footer, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
-		t.from(logo, 0.3, {x:'-=40', opacity:0, ease:Power3.easeOut, delay:0.8});
-		t.from(cta, 0.3, {x:'+=40', opacity:0, ease:Power3.easeOut, delay:0.8});
-		
-		
-		tlPhone.add('begin')		
-		.to(phoneIcon, 1.9, {rotation:'+=90', ease:Bounce.easeOut})
-		.to(phoneIcon, 1.9, {rotation:'-=90', ease:Bounce.easeOut, onComplete:resetPhone})
-		
-		
 				
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
@@ -670,26 +671,18 @@ function init() {
 			}, 20);
 		}
 		
-		if(intro) {
-			
+		if(intro) {			
 			if(_alpha < 235 && _alpha > 225) {
 				clearTimeout(openTimer);
 				openTimer = setTimeout(function() {
 					//alert('OPEN');
 					handleOpen();
 					intro = false;
-				}, 20);
+				}, 50);
 			}
-				
-				
-			
-			
 			//intro = false;
 		}
-		
-		
-		
-		
+
 	});
 	
 	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }
@@ -715,7 +708,6 @@ function init() {
 	$(replayBtn).click( function(e) {
 		handleReplay();
 	})
-	
 	
 	$(function () {
 		document.addEventListener('touchstart', onTouchStart, true);
