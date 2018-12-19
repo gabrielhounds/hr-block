@@ -38,7 +38,9 @@ function init() {
 	var _width = window.innerWidth;
 	var _height = window.innerHeight;
 	var currentMousePos = { x: -1, y: -1 };
-	var main 			= $('#main');
+	var theTime = 30, tRate;
+	var score = 0;
+	//var main 			= $('#main');
 	var main 			= $('<div>', {id:'main'}).css({ width : '100%', height : '100%' }).prependTo('body');
 	var game 			= $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
 	var footer 			= $('<div>', { id : 'footer'}).appendTo(main);
@@ -70,11 +72,11 @@ function init() {
 	var newRow;
 	var controlLock = false;
 	var nextColumnIndex = columnIndex;
-	var columnOffset = 0;
-	var theShape = Utils.random(0, 5);
+	var columnOffset = 1;
+	var theShape = Utils.random(0, 6);
 	var tickTime = 120;
 	
-	//theShape = 3;
+	//theShape = 4;
 	
 	
 	
@@ -108,6 +110,39 @@ function init() {
 		return i === 'filled';
 	}
 	
+	function handleReplay() {
+		//icker.stop();
+		for ( var r = 0; r < rowNum; r++ ) {
+			for ( var c = 0; c < 4; c++ ) {
+				sq[r][c].removeChild(sq[r][c].children[0]);
+				grid[r][c] = 'empty';
+			}
+		}
+		for (var i = stage.children.length - 1; i >= 0; i--) {
+			stage.removeChild(stage.children[i]);
+		};
+		
+		dRate = 0;
+		dTick = 0;
+		tickTime = 60;
+		blockIndex = 0;
+		rowIndex = 0;
+		gridIndex = 0;
+		columnIndex = 1;
+		theTime = 30;
+		score = 0;
+		
+		$(scoreText).html('ROWS : 0');
+		
+		t.to(scoreTab, 0.3, {x:0, ease:Power3.easeOut});
+		
+		t.to(endFrame, 0.3, {autoAlpha:0});
+		setPosition();
+		//initStage();
+		//setUp();
+		//ticker.start();
+	}
+		
 	function handleGameOver() {
 		t.set(endFrame, {autoAlpha:1});
 		
@@ -172,6 +207,7 @@ function init() {
 					blockIndex++;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
 					//theShape = 3;
 				}
@@ -205,6 +241,7 @@ function init() {
 					blockIndex+=3;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
 					//theShape = 3;
 				}
@@ -241,6 +278,7 @@ function init() {
 					blockIndex+=2;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
 					//theShape = 2;
 				}
@@ -276,12 +314,15 @@ function init() {
 					blockIndex+=2;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
 					//theShape = 3;
 				}
 			} else if (theShape === 4) {
 				//log('- EL SQUARE');
+				
 				columnOffset = 1;
+				
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex + 1][columnIndex+1] !== 'filled' && grid[rowIndex][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
 					columnIndex = nextColumnIndex;
@@ -315,8 +356,9 @@ function init() {
 					blockIndex+=3;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
-					//theShape = 3;
+					//theShape = 4;
 				}
 			} else if (theShape === 5) {
 				//log('EL SQUARE');
@@ -355,8 +397,9 @@ function init() {
 					blockIndex+=3;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
-					//theShape = 4;
+					//theShape = 5;
 				}
 			} else if (theShape === 6) {
 				//log('SINGLE SQUARE');
@@ -381,16 +424,16 @@ function init() {
 					blockIndex++;
 					columnIndex = 1;
 					nextColumnIndex = 1;
+					columnOffset = 1;
 					theShape = Utils.random(0, 6);
-					//theShape = 3;
+					//theShape = 6;
 				}
 			} 			
 			dRate = 0;
 		}
 	}
 	
-	var theTime = 30, tRate;
-	var score = 0;
+	
 	function handleTimer(delta) {
 		tRate = delta / 60;
 		theTime -= tRate;
@@ -470,7 +513,7 @@ function init() {
 			};
 			dRate = 0;
 			dTick = 0;
-			tickTime = 30;
+			tickTime = 60;
 			blockIndex = 0;
 			rowIndex = 0;
 			gridIndex = 0;
@@ -601,6 +644,12 @@ function init() {
 	$(window).focus(function(){
 		ticker.start();
 	});
+	
+	$(replayBtn).click( function(e) {
+		handleReplay();
+	})
+	
+	
 	$(function () {
 		document.addEventListener('touchstart', onTouchStart, true);
 		document.addEventListener('touchend', 	onTouchEnd, true);
