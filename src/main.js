@@ -609,7 +609,7 @@ function init() {
 						nextColumnIndex--;
 					}
 				}
-			}, 10);
+			}, 50);
 		}
 		
 		if(_alpha < 160 && _alpha > 100) {
@@ -622,7 +622,7 @@ function init() {
 						nextColumnIndex++;
 					}
 				}
-			}, 10);
+			}, 50);
 		}
 	});
 	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }
