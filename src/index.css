@@ -32,7 +32,8 @@ body {
   font-size: 1.50em;
   font-color: black;
   font-family: monospace;
-  opacity: 0.8; }
+  opacity: 0.0;
+  pointer-events: none; }
 
 #footer {
   width: 100%;
