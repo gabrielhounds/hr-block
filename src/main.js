@@ -6,9 +6,9 @@ function init() {
 	log('init');
 	var t = TweenMax;
 	var tlPhone = new TimelineMax({ repeat:10 });
-	
+
 	var endTl = new TimelineMax({paused:true});
-	
+
 	Utils = (function(){
 		var getMousePosition = function() {
 			return app.renderer.plugins.interaction.mouse.global;
@@ -22,7 +22,7 @@ function init() {
 			getMousePosition : getMousePosition
 		}
 	}());
-	
+
 	var Application = PIXI.Application,
 	loader 			= PIXI.loader,
 	resources 		= PIXI.loader.resources,
@@ -34,7 +34,7 @@ function init() {
 	gridWidth, gridHeight, rowNum;
 	var grid = [],
 	blocks = [], blocks1 = [], sq = [];
-	
+
 	var introOverlay;
 	var introOverlayHeight;
 	var _width = window.innerWidth;
@@ -42,9 +42,9 @@ function init() {
 	var currentMousePos = { x: -1, y: -1 };
 	var theTime = 30, tRate;
 	var score = 0;
-	
+
 	var intro = true;
-	
+
 	//var main 			= $('#main');
 	var main 			= $('<div>', {id:'main'}).css({ width : '100%', height : '100%' }).prependTo('body');
 	var game 			= $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
@@ -66,8 +66,8 @@ function init() {
 	var tagLine 		= $('<div>', { id : 'tagLine'}).appendTo(endFrame);
 	var endCta 			= $('<div>', { id : 'endCta'}).appendTo(endFrame);
 	var endLogo 		= $('<div>', { id : 'endLogo'}).appendTo(endFrame);
-	
-	
+
+
 	var dRate = 0;
 	var dTick = 0;
 	var blockIndex = 0;
@@ -80,17 +80,14 @@ function init() {
 	var columnOffset = 1;
 	var theShape = Utils.random(0, 6);
 	var tickTime = 120;
-	
+
 	//theShape = 4;
-	
-	
-	
+
 	t.set(endFrame, {autoAlpha:0});
 	t.set(scoreTab, {x:-300});
 	$(debugText).html('TEST');
 	$(scoreText).html('ROWS : 00');
-	
-	
+
 	function initStage() {
 		app = new Application({width : _width, height : _height, legacy : true, transparent : false });
 		app.renderer.backgroundColor = 0xFFFFFF;
@@ -110,11 +107,11 @@ function init() {
 		});
 		initLoader();
 	}
-		
+
 	function isFilled(i) {
 		return i === 'filled';
 	}
-	
+
 	function handleOpen() {
 		ticker.stop();
 			for ( var r = 0; r < rowNum; r++ ) {
@@ -142,7 +139,7 @@ function init() {
 			//setUp();
 			//ticker.start();
 	}
-	
+
 	function handleReplay() {
 		//icker.stop();
 		for ( var r = 0; r < rowNum; r++ ) {
@@ -158,7 +155,7 @@ function init() {
 		for (var i = stage.children.length - 1; i >= 0; i--) {
 			stage.removeChild(stage.children[i]);
 		};
-		
+
 		dRate = 0;
 		dTick = 0;
 		tickTime = 60;
@@ -168,49 +165,49 @@ function init() {
 		columnIndex = 1;
 		theTime = 30;
 		score = 0;
-		
+
 		$(scoreText).html('ROWS : 0');
-		
+
 		t.to(scoreTab, 0.3, {x:0, ease:Power3.easeOut});
-		
+
 		t.to(endFrame, 0.3, {autoAlpha:0});
 		setPosition();
 		//initStage();
 		//setUp();
 		//ticker.start();
 	}
-		
+
 	function handleGameOver() {
 		t.to(endFrame, 0.3, {autoAlpha:1, onComplete: function() { endTl.play(); } });
-		
-		endTl.from(endHeader, 0.3, {y:'-=20', opacity:0})		
+
+		endTl.from(endHeader, 0.3, {y:'-=20', opacity:0})
 			 .from(endSubHead, 0.3, {y:'-=20', opacity:0}, '-=0.2')
 			 .from(replayBtn, 0.3, {x:'-=20', opacity:0}, '-=0.2')
 			 .from(tagLine, 0.3, {x:'-=20', opacity:0}, '-=0.2')
 			 .from(endCta, 0.3, {y:'+=20', opacity:0}, '-=0.3')
 			 .from(endLogo, 0.3, {y:'+=20', opacity:0}, '-=0.2')
 
-		
-		
+
+
 		//endTl.play();
-		
-		
-		
-		
+
+
+
+
 		var rowText = (score > 1 || score === 0) ? ' Rows.' : ' Row.';
-		
+
 		$(endSubHead).html('You cleared ' + score + rowText);
 	}
-	
+
 	function handleRowDrop() {
-		
+
 		//alert(rowIndex);
-		
+
 		for (var i = 0; i < 4; i++) {
 			sq[rowIndex][i].removeChild( sq[rowIndex][i].children[0] );
 			grid[rowIndex][i] = 'empty';
 		}
-		
+
 		for (var r = rowIndex - 1; r >= 0; r--) {
 			for (c = 4 - 1; c >= 0; c--) {
 				if( sq[r][c].children.length !== 0 ) {
@@ -308,14 +305,14 @@ function init() {
 					sq[rowIndex][columnIndex].addChild(blocks1[blockIndex]);
 					sq[rowIndex-1][columnIndex+1].addChild(blocks1[blockIndex+1]);
 				} else {
-					
+
 					grid[rowIndex][columnIndex] = 'filled';
 					if ( typeof grid[rowIndex-1] != 'undefined') {
 						grid[rowIndex-1][columnIndex+1] = 'filled';
 					} else {
 						log('undefined row num');
 					}
-					
+
 					if (rowIndex === 0 || rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						handleGameOver();
@@ -344,14 +341,14 @@ function init() {
 					sq[rowIndex][columnIndex+1].addChild(blocks[blockIndex]);
 					sq[rowIndex-1][columnIndex].addChild(blocks[blockIndex+1]);
 				} else {
-					
+
 					grid[rowIndex][columnIndex+1] = 'filled';
 					if ( typeof grid[rowIndex-1] != 'undefined') {
 						grid[rowIndex-1][columnIndex] = 'filled';
 					} else {
 						log('undefined row num');
 					}
-					
+
 					if (rowIndex === 0 || rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						handleGameOver();
@@ -371,9 +368,9 @@ function init() {
 				}
 			} else if (theShape === 4) {
 				//log('- EL SQUARE');
-				
+
 				columnOffset = 1;
-				
+
 				if (rowIndex < grid.length-1 && grid[rowIndex + 1][columnIndex] !== 'filled' && grid[rowIndex + 1][columnIndex+1] !== 'filled' && grid[rowIndex][columnIndex+1] !== 'filled' ) {
 					rowIndex++;
 					columnIndex = nextColumnIndex;
@@ -383,17 +380,17 @@ function init() {
 					sq[rowIndex][columnIndex+1].addChild(blocks1[blockIndex+1]);
 					sq[rowIndex-1][columnIndex+1].addChild(blocks1[blockIndex+2]);
 				} else {
-					
+
 					grid[rowIndex][columnIndex] = 'filled';
 					grid[rowIndex][columnIndex+1] = 'filled';
-					
+
 					if ( typeof grid[rowIndex-1] != 'undefined') {
 						grid[rowIndex-1][columnIndex+1] = 'filled';
 					} else {
 						log('undefined row num');
 					}
-					
-					
+
+
 					if (rowIndex === 0 || rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						handleGameOver();
@@ -422,19 +419,19 @@ function init() {
 					sq[rowIndex][columnIndex].addChild(blocks[blockIndex]);
 					sq[rowIndex][columnIndex+1].addChild(blocks[blockIndex+1]);
 					sq[rowIndex-1][columnIndex].addChild(blocks[blockIndex+2]);
-					
+
 				} else {
-					
+
 					grid[rowIndex][columnIndex] = 'filled';
 					grid[rowIndex][columnIndex+1] = 'filled';
-					
+
 					if ( typeof grid[rowIndex-1] != 'undefined') {
 						grid[rowIndex-1][columnIndex] = 'filled';
 					} else {
 						log('undefined row num');
 					}
-					
-					
+
+
 					if (rowIndex === 0 || rowIndex === 1) {
 						log('+++++++++ AT THE TOP - GAME OVER ++++++++++++ ');
 						handleGameOver();
@@ -479,24 +476,24 @@ function init() {
 					theShape = Utils.random(0, 6);
 					//theShape = 6;
 				}
-			} 			
+			}
 			dRate = 0;
 		}
 	}
-	
-	
+
+
 	function handleTimer(delta) {
 		tRate = delta / 60;
 		theTime -= tRate;
 		$(timeText).html('TIME : ' + Math.round(theTime));
-		
+
 		if (Math.round(theTime) <= 0) {
 			//alert('times up. game over');
 			ticker.stop();
 			handleGameOver();
 		}
 	}
-	
+
 	function handleScore() {
 		if (score < 10 ) {
 			$(scoreText).html('ROWS : 0' + score);
@@ -504,7 +501,7 @@ function init() {
 			$(scoreText).html('ROWS : '+ score);
 		}
 	}
-	
+
 	function setPosition() {
 		log('setPosition');
 		gridWidth  = _width / 4;
@@ -543,28 +540,28 @@ function init() {
 		introOverlayHeight = (_height - footerHeight)
 		$(footer).css({ height : footerHeight , opacity : 1});
 		$(introOverlay).css({ height : introOverlayHeight });
-		
+
 		if (intro){
-		
+
 			function resetPhone() {
 				t.set(phoneIcon, {rotation:'0deg'})
 			}
-		
+
 			t.from(phoneIcon, 0.9, {scale:0.1, opacity:0, ease:Elastic.easeOut, delay:0.5});
 			t.set(phoneIcon, {rotation:'-45deg'});
 			t.from(instructionText, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
-		
-		
+
+
 			t.from(footer, 0.3, {y:'+=40', opacity:0, ease:Power3.easeOut, delay:0.5});
 			t.from(logo, 0.3, {x:'-=40', opacity:0, ease:Power3.easeOut, delay:0.8});
 			t.from(cta, 0.3, {x:'+=40', opacity:0, ease:Power3.easeOut, delay:0.8});
-			
-			tlPhone.add('begin')		
+
+			tlPhone.add('begin')
 			.to(phoneIcon, 1.9, {rotation:'+=90', ease:Bounce.easeOut})
 			.to(phoneIcon, 1.9, {rotation:'-=90', ease:Bounce.easeOut, onComplete:resetPhone})
 			.add('end');
 		}
-				
+
 		//SOME DEBUG STUFF
 		sq[1][0].interactive = true;
 		sq[1][0].on('pointerup', function(e){
@@ -572,47 +569,47 @@ function init() {
 			log(grid);
 			ticker.stop();
 		});
-		
+
 		$(introOverlay).click( function(e) {
 			intro = false;
 			handleOpen();
 		})
 		ticker.start();
 	}
-	
+
 	function createBlock() {
 	}
-	
+
 	function setUp() {
 		log('setup');
-		
+
 		//blockImg0 = new PIXI.Sprite(resources['credit.png'].texture);
 		//blockImg1 = new PIXI.Sprite(resources['deduction.png'].texture);
-		
+
 		for (var i = 0; i < 100; i++) {
 			blocks.push(blocks[i] = new PIXI.Sprite(resources['credit.png'].texture));
 			blocks1.push(blocks1[i] = new PIXI.Sprite(resources['deduction.png'].texture));
 
 		}
-		
-		
-		
+
+
+
 		gameBoard = new PIXI.Container();
 		setPosition();
 	}
-	
+
 	function loadProgressHandler() {
 		log('loading');
 		//loadingText.setText( 'LOADING ' + Math.round(loader.progress) + '%');
 	}
-	
+
 	function initLoader() {
 		loader.add([
 			'credit.png',
 			'deduction.png'
 		]).on('progress', loadProgressHandler).load(setUp);
 	}
-	
+
 	$(document).on('keydown', function(e){
 		if(e.keyCode == 37) {
 			log('LEFT ARROW');
@@ -636,7 +633,7 @@ function init() {
 			}
 		}
 	});
-	
+
 	var leftTimer, rightTimer, openTimer;
 	window.addEventListener('deviceorientation', function(e) {
 		alpha 	= Math.round(e.alpha);
@@ -648,7 +645,7 @@ function init() {
 			_alpha = alpha - 180;
 		}
 		$(debugText).html('ALPHA : ' + _alpha + '<br>' + 'BETA : ' + beta + '<br>' + 'GAMMA : ' + gamma + '<br>' + 'MOVE TRIGGERED? : ');
-		
+
 		if(_alpha > 220 && _alpha < 240) {
 			clearTimeout(leftTimer);
 			leftTimer = setTimeout(function() {
@@ -661,7 +658,7 @@ function init() {
 				}
 			}, 20);
 		}
-		
+
 		if(_alpha < 160 && _alpha > 100) {
 			clearTimeout(rightTimer);
 			rightTimer = setTimeout(function() {
@@ -674,8 +671,8 @@ function init() {
 				}
 			}, 20);
 		}
-		
-		if(intro) {			
+
+		if(intro) {
 			if(_alpha < 235 && _alpha > 225) {
 				clearTimeout(openTimer);
 				openTimer = setTimeout(function() {
@@ -688,7 +685,7 @@ function init() {
 		}
 
 	});
-	
+
 	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }
 	$(window).resize(function(e) {
 		clearTimeout(resizeTimer);
@@ -708,11 +705,11 @@ function init() {
 	$(window).focus(function(){
 		ticker.start();
 	});
-	
+
 	$(replayBtn).click( function(e) {
 		handleReplay();
 	})
-	
+
 	$(function () {
 		document.addEventListener('touchstart', onTouchStart, true);
 		document.addEventListener('touchend', 	onTouchEnd, true);
