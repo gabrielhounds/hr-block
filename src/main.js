@@ -613,8 +613,9 @@ function init() {
 	$(document).on('keydown', function(e){
 		if(e.keyCode == 37) {
 			log('LEFT ARROW');
+			log(grid[rowIndex+1][columnIndex-1]);
 			//if( columnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled') {
-			if( nextColumnIndex > 0) {
+			if( nextColumnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled'  ) {
 				if(nextColumnIndex < 0) {
 					nextColumnIndex = 0;
 				} else {
@@ -624,7 +625,7 @@ function init() {
 		}
 		if(e.keyCode == 39) {
 			log('RIGHT ARROW');
-			if( nextColumnIndex < 3 - columnOffset) {
+			if( nextColumnIndex < 3 - columnOffset && grid[rowIndex+1][columnIndex+1 + columnOffset ] !== 'filled') {
 				if (nextColumnIndex - columnOffset > 3) {
 					nextColumnIndex = 3 - columnOffset;
 				} else {
@@ -648,8 +649,10 @@ function init() {
 
 		if(_alpha > 220 && _alpha < 240) {
 			clearTimeout(leftTimer);
+
 			leftTimer = setTimeout(function() {
-				if( nextColumnIndex > 0) {
+
+				if( nextColumnIndex > 0 && grid[rowIndex+1][columnIndex-1] !== 'filled' ) {
 					if(nextColumnIndex < 0) {
 						nextColumnIndex = 0;
 					} else {
@@ -662,7 +665,7 @@ function init() {
 		if(_alpha < 160 && _alpha > 100) {
 			clearTimeout(rightTimer);
 			rightTimer = setTimeout(function() {
-				if( nextColumnIndex < 3 - columnOffset) {
+				if( nextColumnIndex < 3 - columnOffset && grid[rowIndex+1][columnIndex+1 + columnOffset ] !== 'filled') {
 					if (nextColumnIndex - columnOffset > 3) {
 						nextColumnIndex = 3 - columnOffset;
 					} else {
