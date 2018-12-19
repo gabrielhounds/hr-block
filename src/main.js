@@ -42,6 +42,9 @@ function init() {
 	var currentMousePos = { x: -1, y: -1 };
 	var theTime = 30, tRate;
 	var score = 0;
+	
+	var intro = true;
+	
 	//var main 			= $('#main');
 	var main 			= $('<div>', {id:'main'}).css({ width : '100%', height : '100%' }).prependTo('body');
 	var game 			= $('<div>', { id : 'game' }).css({ width : '100%', height : '100%' }).appendTo(main);
@@ -110,6 +113,34 @@ function init() {
 		
 	function isFilled(i) {
 		return i === 'filled';
+	}
+	
+	function handleOpen() {
+		ticker.stop();
+			for ( var r = 0; r < rowNum; r++ ) {
+				for ( var c = 0; c < 4; c++ ) {
+					sq[r][c].removeChild(sq[r][c].children[0]);
+					grid[r][c] = 'empty';
+				}
+			}
+			for (var i = stage.children.length - 1; i >= 0; i--) {
+				stage.removeChild(stage.children[i]);
+			};
+			dRate = 0;
+			dTick = 0;
+			tickTime = 60;
+			blockIndex = 0;
+			rowIndex = 0;
+			gridIndex = 0;
+			columnIndex = 1;
+			theTime = 30;
+			score = 0;
+			t.to(scoreTab, 0.3, {x:0, ease:Power3.easeOut});
+			t.to(introOverlay, 0.3, {autoAlpha:0});
+			setPosition();
+			//initStage();
+			//setUp();
+			//ticker.start();
 	}
 	
 	function handleReplay() {
@@ -536,32 +567,10 @@ function init() {
 			log(grid);
 			ticker.stop();
 		});
+		
 		$(introOverlay).click( function(e) {
-			ticker.stop();
-			for ( var r = 0; r < rowNum; r++ ) {
-				for ( var c = 0; c < 4; c++ ) {
-					sq[r][c].removeChild(sq[r][c].children[0]);
-					grid[r][c] = 'empty';
-				}
-			}
-			for (var i = stage.children.length - 1; i >= 0; i--) {
-				stage.removeChild(stage.children[i]);
-			};
-			dRate = 0;
-			dTick = 0;
-			tickTime = 60;
-			blockIndex = 0;
-			rowIndex = 0;
-			gridIndex = 0;
-			columnIndex = 1;
-			theTime = 30;
-			score = 0;
-			t.to(scoreTab, 0.3, {x:0, ease:Power3.easeOut});
-			t.to(introOverlay, 0.3, {autoAlpha:0});
-			setPosition();
-			//initStage();
-			//setUp();
-			//ticker.start();
+			intro = false;
+			handleOpen();
 		})
 		ticker.start();
 	}
@@ -623,7 +632,7 @@ function init() {
 		}
 	});
 	
-	var leftTimer, rightTimer;
+	var leftTimer, rightTimer, openTimer;
 	window.addEventListener('deviceorientation', function(e) {
 		alpha 	= Math.round(e.alpha);
 		beta 	= Math.round(e.beta);
@@ -660,7 +669,29 @@ function init() {
 				}
 			}, 20);
 		}
+		
+		if(intro) {
+			
+			if(_alpha < 235 && _alpha > 225) {
+				clearTimeout(openTimer);
+				openTimer = setTimeout(function() {
+					//alert('OPEN');
+					handleOpen();
+					intro = false;
+				}, 20);
+			}
+				
+				
+			
+			
+			//intro = false;
+		}
+		
+		
+		
+		
 	});
+	
 	//While(stage.children[0]) { stage.removeChild(stage.children[0]); }
 	$(window).resize(function(e) {
 		clearTimeout(resizeTimer);
