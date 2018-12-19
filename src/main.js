@@ -147,7 +147,11 @@ function init() {
 		//icker.stop();
 		for ( var r = 0; r < rowNum; r++ ) {
 			for ( var c = 0; c < 4; c++ ) {
-				sq[r][c].removeChild(sq[r][c].children[0]);
+				for (var i = sq[r][c].children.length - 1; i >= 0; i--) {
+					sq[r][c].removeChild(sq[r][c].children[i]);
+				}
+
+				//sq[r][c].removeChild(sq[r][c].children[0]);
 				grid[r][c] = 'empty';
 			}
 		}
